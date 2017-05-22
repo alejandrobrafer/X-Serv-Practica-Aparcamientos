@@ -1,0 +1,18 @@
+{% extends "index.html" %}
+
+{% block menu %}
+<ul>
+  <a href="/aparcamientos"><li> Todos </li></a>
+  <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/ranking"><li>Ranking</li></a>
+</ul>
+{% endblock %}
+
+{% block contenido %}
+  <div id="primera_vez">
+    <br/>
+    <a href="/cargar">Pulsa para cargar el fichero sobre la base de datos</a>
+  </div>
+{% endblock %}

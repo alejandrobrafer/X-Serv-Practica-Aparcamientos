@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="utf-8">
+	<link href="templates/styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+  <title> Bienvenido a AlojaMadrid! </title>
+
+  <div id="upbg"></div>
+
+  <div id="outer">
+
+  	<div id="header">
+  		<div id="headercontent">   <!--parte del titulo de la pagina-->
+  			<h1>AparcaMadrid!</h1>
+  			<h2>Encuentra el mejor aparcamiento de tu zona</h2>
+  		</div>
+  	</div>
+
+
+    <!--parte de arriba a la derecha-->
+    <div id="arriba_dcha">
+      {% if user.is_authenticated %}
+        <p>Bienvenid@, {{user.username}}!</p>
+        <a href="/logout"><input type="button" value="Logout" /></a>
+      {% else %}
+        <form method="POST" action="/login">
+        {% csrf_token %}
+        Usuario: <input type="username" name="username" /><br/>
+        Clave: <input type="password" name="password" /><br/>
+        <input type="submit" value="Login" />
+        </form>
+      {% endif %}
+    </div>
+
+
+    <div id="headerpic"></div>
+
+    <!--parte del menu horizontal-->
+    <div id="menu">
+      {% block menu %} {% endblock %}
+    </div>
+
+    <!--esta es la parte que cambia segun la pagina-->
+    <div id="contenido">
+      {% block contenido %} {% endblock %}
+    </div>
+
+    <!--pie de pagina-->
+    <div id="pie_pagina">
+      Esta aplicacion utiliza datos del portal de datos abiertos del ayuntamiento de Madrid
+      <br/>
+      <a href="http://bit.ly/1T24Zsq">Enlace a la descripcion</a>
+      <a href="http://www.esmadrid.com/opendata/alojamientos_v1_es.xml">Enlace al fichero XML</a>
+    </div>
+  </div>
+</body>

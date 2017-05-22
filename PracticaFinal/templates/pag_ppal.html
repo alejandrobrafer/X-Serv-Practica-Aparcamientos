@@ -1,0 +1,66 @@
+{% extends "index.html" %}
+
+
+{% block menu %}
+<ul>
+  <a href="/aparcamientos"><li> Todos </li></a>
+  <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/ranking"><li>Ranking</li></a>
+</ul>
+{% endblock %}
+
+
+{% block contenido %}
+
+<div id="primarycontainer">
+  <br/><h3><center><em><u>Aparcamientos más comentados</u></em></center></h3><br/>
+  <div id="primarycontent">
+    <br/><br/>
+    {% if not vacio %}
+        {% for aparcamiento, foto in lista_aparcamientos %}
+        <div class="post">
+          <h3><a href="{{aparcamiento.web}}">{{aparcamiento.nombre}}</a></h3>
+          <div class="contentarea">
+            <p>         C/ {{aparcamiento.direccion}}</p>
+            {% if foto != ' '%}
+            <img src="{{foto}}" class="left" />
+            {% endif%}
+            <ul class="controls">
+              <li><a href="/aparcamientos/{{aparcamiento.id}}" class="more">Más información</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="divider2"></div>
+        {% endfor %}
+        <p>Si desea cargar el XML con el contenido de esta pagina&nbsp<a href="/ppal_xml">pulse aquí</a></p>
+    {% else %}
+      <h2>No hay ningun aparcamiento con comentarios</h2>
+    {% endif %}
+  </div>
+</div>
+
+<div id="secondarycontent">
+  <div>
+    <br/><br/>
+    <div class="box" style="text-align:center">
+      <h4>Páginas de otros usuarios:</h4>
+      <div class="contentarea">
+        <ul class="linklist">
+          {% for titulo, usuario in lista_titulos %}
+            {% if usuario != user.username %}
+              <li>
+                <a href="/{{usuario}}">{{usuario}}&nbsp--&nbsp{{titulo | safe}}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

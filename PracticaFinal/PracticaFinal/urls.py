@@ -14,7 +14,16 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from aparcamientos import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    #url(r'^/about$', views.about, name= "Pagina autoría práctica"),
+    url(r'^$', views.pag_principal, name= "Pagina principal de la  practica"),
+    #url(r'.*/templates/estilo_general\.css$', views.css),
+    url(r'templates/styles\.css', views.css),
+    #url(r'^/aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
+    #url(r'^/aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
+    #url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),
+    url(r'^(.+)$', views.pag_usuario, name= "Pagina personal de un usuario"),
 ]

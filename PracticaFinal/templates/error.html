@@ -1,0 +1,22 @@
+{% extends "index.html" %}
+
+
+{% block menu %}
+<ul>
+  <a href="/"><li> Inicio </li></a>
+  <a href="/aparcamientos"><li> Todos </li></a>
+  <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/ranking"><li>Ranking</li></a>
+</ul>
+{% endblock %}
+
+
+{% block contenido %}
+
+<div id="primarycontainer">
+  <h3> {{texto}}</h3>
+</div>
+
+{% endblock %}

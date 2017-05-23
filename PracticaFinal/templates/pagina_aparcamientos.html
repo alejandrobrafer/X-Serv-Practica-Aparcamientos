@@ -1,0 +1,73 @@
+{% extends "index.html" %}
+
+{% block menu %}
+<ul>
+  <a href="/"><li> Inicio </li></a>
+  <a href="/aparcamientos"><li> Todos </li></a>
+  <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/ranking"><li>Ranking</li></a>
+</ul>
+{% endblock %}
+
+
+{% block contenido %}
+
+  <div id="primarycontainer">
+    <br/><h3><center><em><u>Aparcamientos disponibles</u></em></center></h3><br/>
+    <br/><br/>
+    <div id="primarycontent">
+      {% for aparca, id in lista_aparcamientos %}
+      <div class="post">
+        <p>{{aparca}}</p>
+        <div class="contentarea">
+          <ul class="controls">
+            <li><a href="/aparcamientos/{{id}}" class="more">Leer más</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="divider2"></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="secondarycontent">
+    <div class="box">
+      <h4>Filtrar aparcamientos por:</h4>
+      <form action="/aparcamientos" method="post">
+      {% csrf_token %}
+      <p>Categoria:</p>
+      <select name="distrito">
+        <option>Todos</option>
+        <option>CENTRO</option>
+        <option>CHAMARTIN</option>
+        <option>TETUAN</option>
+        <option>MONCLOA-ARAVACA</option>
+        <option>RETIRO</option>
+        <option>SALAMANCA</option>
+        <option>MORATALAZ</option>
+        <option>CHAMBERI</option>
+        <option>SAN BLAS-CANILLEJAS</option>
+        <option>CIUDAD LINEAL</option>
+        <option>FUENCARRAL-EL PARDO</option>
+        <option>ARGANZUELA</option>
+        <option>VILLA DE VALLECAS</option>
+        <option>LATINA</option>
+        <option>HORTALEZA</option>
+        <option>PUENTE DE VALLECAS</option>
+        <option>TETUAN</option>
+        <option>CARABANCHEL</option>
+        <option>VILLAVERDE</option>
+        <option>BARAJAS</option>
+        <option>VICALVARO</option>
+        <option>USERA</option>
+      </select>
+      <br/><br/>
+      <input type="submit" value="Filtrar">
+      </form>
+    </div>
+  </div>
+
+
+{% endblock %}

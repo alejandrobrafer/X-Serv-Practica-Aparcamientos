@@ -14,12 +14,15 @@ class Aparcamiento(models.Model):
 class Comentario(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)
     texto = models.TextField()
+    usuario = models.CharField(max_length=32)
+    fecha = models.DateField(auto_now = True)
 
 class Cambio(models.Model): #cambiar el estilo CSS de la pagina del usuario
     usuario = models.ForeignKey(User)
+    titulo = models.CharField(max_length=64, default='')
     letra = models.IntegerField()
     color = models.CharField(max_length=32)
-    titulo = models.CharField(max_length=64, default='')
+
 
 class Elegido(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)

@@ -18,12 +18,15 @@ from aparcamientos import views
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
-    #url(r'^/about$', views.about, name= "Pagina autoría práctica"),
+    url(r'^about$', views.about, name= "Pagina autoría práctica"),
     url(r'^$', views.pag_principal, name= "Pagina principal de la  practica"),
+    url(r'.*/images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'templates/images/'}),
     #url(r'.*/templates/estilo_general\.css$', views.css),
     url(r'templates/styles\.css', views.css),
-    #url(r'^/aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
-    #url(r'^/aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
+    url(r'^login$', views.login),
+    url(r'^logout$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
+    url(r'^/aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
+    url(r'^/aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
     #url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),
-    url(r'^(.+)$', views.pag_usuario, name= "Pagina personal de un usuario"),
+    url(r'^(.*)$', views.pag_usuario, name= "Pagina personal de un usuario"),
 ]

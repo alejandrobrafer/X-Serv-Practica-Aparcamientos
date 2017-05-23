@@ -295,15 +295,12 @@ text-decoration: none;
 text-decoration: overline;
 }*/
 
-#menu .idiomas
-{
-padding-top: 10px;
-}
+
 
 #arriba_dcha
 {
 position: absolute;
-top: 2.5em;
+top: 3.0em;
 right: 2.0em;
 padding-right: 0.0em;
 color: #48D1CC;

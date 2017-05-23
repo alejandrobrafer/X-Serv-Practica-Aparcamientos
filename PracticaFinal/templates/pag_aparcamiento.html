@@ -1,0 +1,100 @@
+{% extends "index.html" %}
+
+
+{% block menu %}
+<ul>
+  <a href="/"><li> Inicio </li></a>
+  <a href="/aparcamientos"><li> Todos </li></a>
+  <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/ranking"><li>Ranking</li></a>
+</ul>
+
+{% endblock %}
+
+
+{% block contenido %}
+
+  <div id="normalcontent">
+    <br/>
+    <h1><strong>{{aparcamiento.nombre}}</strong></h1>
+    <h2><strong>{{aparcamiento.direccion}}</strong></h2>
+    <p>{{aparcamiento.descripcion | safe}}</p>
+    <br/>
+  </div>
+
+
+  <div id="primarycontainer">
+    <div id="primarycontent">
+      <div class="post">
+          <br/>
+          <div class="megusta">
+            <form method="get" action="/megusta/{{aparcamiento.id}}">
+              <button type="submit">
+                <img src="templates/images/corazon.jpg"/><sup><b>Me gusta</b></sup>
+              </button>
+              &nbsp&nbsp<img src="templates/images/cora.png" class="corazon"/>&nbsp<b>{{megustas}}</b>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="divider2"></div>
+      <div class="post">
+        <div class="contentarea">
+          <h2>Latitud y longitud:</h2>
+          {{aparcamiento.latitud}}<br/>
+          {{aparcamiento.longitud}}<br/>
+          <h2>Barrio y distrito:</h2>
+          {{aparcamiento.barrio}}<br/>
+          {{aparcamiento.distrito}}<br/>
+        </div>
+        <div class="divider2"></div>
+      </div>
+
+
+      {% if user.is_authenticated %}
+        {% if NoComent %}
+          <div class="post">
+            <div class="contentarea">
+              {% csrf_token %}
+              <form action="/poner_comentario/{{aparcamiento.id}}" method="post">
+                <h2>¿Desea poner un comentario?</h2>
+                <textarea cols="60" rows="6" name="comentario">Escriba aqui su comentario...</textarea>
+                <br/>
+                <input type="submit" value="Enviar">
+              </form>
+            </div>
+          </div>
+          <div class="divider2"></div>
+        {% endif %}
+      {% endif %}
+      {% if user.is_authenticated %}
+        <p>Si desea incluir este aparcamiento en su página personal&nbsp<a href="/anadir_a_pag/{{aparcamiento.id}}">pulse aquí</a></p>
+        <p>Si desea cargar el canal RSS con los comentarios de este aparcamiento&nbsp<a href="/rss/{{aparcamiento.id}}">pulse aquí</a></p>
+      {% endif %}
+    </div>
+  </div>
+
+
+  <div id="secondarycontent">
+    <div class="box">
+      <h3>Comentarios: </h3>
+      <div class="contentarea">
+        {% if not Comentarios_vacio %}
+          {% for usuario, texto, fecha in comentarios %}
+          <p><strong>{{usuario | safe}}</strong>&nbsp<sub>{{fecha}}</sub></p>
+          <p>{{texto | safe}}</p>
+          <br/> <br/>
+          {% endfor %}
+        {% else %}
+          <p>Sé el primero en poner un comentario!</p>
+        {% endif %}
+      </div>
+    </div>
+    <div class="contentarea">
+      <p><b>Visitas:</b>{{visitas}}</p>
+    </div>
+  </div>
+
+{% endblock %}

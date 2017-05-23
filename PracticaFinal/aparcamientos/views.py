@@ -2,7 +2,8 @@ from django.shortcuts import render
 from aparcamientos.models import Aparcamiento, Cambio, Comentario, Elegido
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
 from django.template import Context
 from django.template import RequestContext
@@ -104,15 +105,15 @@ def pag_principal(request):
                 #    buena = foto.url
                 lista_aparcamientos.append(aparcamiento)
                 #lista_aparcamientos.append((aparcamiento, buena))
-                template = get_template('pag_ppal.html')
-                context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'vacio': vacio})
+            template = get_template('pag_ppal.html')
+            context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'vacio': vacio})
             #context = RequestContext(request, {'lista_aparcamientos':  'lista_titulos'})
-                resp = template.render(context)
+            resp = template.render(context)
             return HttpResponse(resp)
 
 def pag_usuario(request, usuario):
     try:
-        camibo = Cambio.objects.get(usuario=usuario)
+        cambio = Cambio.objects.get(usuario=usuario)
         titulo = cambio.titulo
     except:
         titulo = ''
@@ -139,6 +140,115 @@ def pag_usuario(request, usuario):
     template = get_template('pag_usuario.html')
     context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'vacio': vacio, 'titulo': titulo, 'usuario':usuario})
     return HttpResponse(template.render(context))
+
+@csrf_exempt
+def pag_aparcamientos(request):
+    if request.method == 'GET':
+        aparcamientos = Aparcamiento.objects.all()
+
+    elif request.method == 'POST':
+        distrito = request.body.split('&')[7].split('=')[1]
+        distrito = poner_espacios(categoria)[:-1]
+        aparcamientos = Aparcamiento.objects.filter(distrito = distrito)
+
+
+    lista_aparca=[]
+    for aparc in aparcamientos:
+        lista_aparca.append((aparc.nombre, aparc.id))
+
+    template = get_template('pagina_aparcamientos.html')
+    context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos})
+    return HttpResponse(template.render(context))
+
+def pag_aparcamiento(request, identificador):
+    aparcamiento = Aparcamiento.objects.get(id = int(identificador))
+    nombre = aparcamiento.nombre
+    comentarios = Comentario.objects.filter(hotel = aparcamiento)
+    if len(comentarios) != 0:
+        Comentarios_vacio = False;
+    else:
+        Comentarios_vacio = True;
+    try:
+        coment_usu = Comentario.objects.get(aparcamiento = aparcamiento, usuario = request.user.username)
+        NoComent = False
+    except ObjectDoesNotExist:
+        NoComent = True
+    lista_comentarios=[]
+    for coment in comentarios:
+        lista_comentarios.append((coment.usuario, coment.texto, coment.fecha))
+
+    visitas = contador_visitas(identificador)
+    megustas = contador_megustas(identificador)
+    template = get_template('pag_aparcamiento.html')
+    context = RequestContext(request, {'aparcamiento': aparcamiento,'comentarios': lista_comentarios, 'NoComent': NoComent, 'Comentarios_vacio': Comentarios_vacio, 'visitas': visitas, 'megustas': megustas})
+    return HttpResponse(template.render(context))
+
+def about(request):
+    template = get_template('about.html')
+    context = RequestContext(request)
+    return HttpResponse(template.render(context))
+
+def poner_espacios(frase_inicial):
+    palabras = frase_inicial.split('+')
+    frase = ''
+    for palabra in palabras:
+
+        frase += palabra + ' '
+    return frase
+
+@csrf_exempt
+def poner_comentario(request, identificador):
+    if request.method == 'POST':
+        usuario = request.user.username
+        aparca = Aparcamiento.objects.get(id=int(identificador))
+        comentario = request.body.split('&')[0].split('=')[1] #el primer 1 depende de lo que imprima el request.body pq a veces el primer campo es algo que pone el navegador
+        comentario = poner_espacios(comentario)
+        nuevo_comentario = Comentario(aparcamiento=aparca, texto=comentario, usuario=usuario)
+        nuevo_comentario.save()
+        direccion = "/aparcamientos/" + str(identificador)
+        return HttpResponseRedirect(direccion)
+    else:
+        return HttpResponse("Error")
+
+@csrf_exempt
+def login(request):
+
+    username = request.body.split('&')[1].split('=')[1]
+    password = request.body.split('&')[2].split('=')[1]
+
+    user = auth.authenticate(username=username, password=password)
+    if user is not None:
+        # Correct password, and the user is marked "active"
+        auth.login(request, user)
+        # Redirect to a success page.
+        return HttpResponseRedirect('/')
+    else:
+        template = get_template('error.html')
+        return HttpResponse(template.render(Context({'texto': "Usuario no autenticado"})))
+
+def anadir_aparcamiento_pag(request, identificador):
+    try:
+        aparca = Aparcamiento.objects.get(id=int(identificador))
+    except ObjectDoesNotExist:
+        template = get_template('error.html')
+        return HttpResponse(template.render(Context({'texto': "Lo sentimos, no existe un aparcamiento con dicho identificador"})))
+    usuario = request.user.username
+    aparcamiento_anadido = Seleccionado(aparcamiento=aparca, usuario=usuario)
+    aparcamiento_anadido.save()
+
+    direccion = '/' + usuario
+    return HttpResponseRedirect(direccion)
+
+
+
+#def pag_xml(request, usuario):
+#    aparcamientos_usuario = Elegido.objects.filter(usuario = usuario)
+#    lista_todo = []
+#    for aparca in aparcamientos_usuario:
+#        lista_todo.append(aparca)
+#    template = get_template('fichero_xml.xml')
+#    context = RequestContext(request, {'lista_todo': lista_todo})
+#    return HttpResponse(template.render(context), content_type="text/xml")
 
 def css(request):
     usuario = request.user.username
@@ -204,3 +314,20 @@ def css(request):
         template = get_template('styles.css')
         context = RequestContext(request, {'color': color, 'letra': letra})
         return HttpResponse(template.render(context), content_type="text/css")
+
+
+def cambiar_titulo(request):
+    letra_defecto = '1.3em'
+    color_defecto = 'white'
+    if request.method == "POST":
+        titulo = request.body.split('&')[1].split('=')[1]
+        titulo = poner_espacios(titulo)
+        try:
+            cambio = Cambio.objects.get(usuario=request.user.username)
+            cambio.titulo = titulo
+            cambio.save()
+        except:
+            cambio = Cambio(usuario=request.user.username, titulo=titulo, letra=letra_defecto, color=color_defecto)
+            cambio.save()
+        direccion = '/' + request.user.username
+        return HttpResponseRedirect(direccion)

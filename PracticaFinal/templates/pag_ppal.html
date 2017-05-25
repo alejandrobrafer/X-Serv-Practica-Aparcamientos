@@ -24,9 +24,6 @@
           <h3><a href="{{aparcamiento.web}}">{{aparcamiento.nombre}}</a></h3>
           <div class="contentarea">
             <p>         C/ {{aparcamiento.direccion}}</p>
-            {% if foto != ' '%}
-            <img src="{{foto}}" class="left" />
-            {% endif%}
             <ul class="controls">
               <li><a href="/aparcamientos/{{aparcamiento.id}}" class="more">Más información</a></li>
             </ul>
@@ -35,7 +32,7 @@
 
         <div class="divider2"></div>
         {% endfor %}
-        <p>Si desea cargar el XML con el contenido de esta pagina&nbsp<a href="/ppal_xml">pulse aquí</a></p>
+
     {% else %}
       <h2>No hay ningun aparcamiento con comentarios</h2>
     {% endif %}
@@ -58,6 +55,19 @@
           {% endfor %}
         </ul>
       </div>
+      <h2>Botón de accesibilidad</h2>
+        {% if accesibilidad %}
+            <p>Pulse para ver los aparcamientos accesibles</p>
+            <form method="post" action="/">
+                <input type="submit" value="Desactivar" name="boton">
+            </form>
+        {% else %}
+            <p>Pulse para ver los aparcamientos accesibles</p>
+            <form method="post" action="/">
+                <input type="submit" value="Activar" name="boton">
+            </form>
+        {% endif %}
+    <hr />
     </div>
   </div>
 </div>

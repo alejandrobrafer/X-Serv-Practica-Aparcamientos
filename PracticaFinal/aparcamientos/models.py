@@ -2,14 +2,21 @@ from django.db import models
 from django.contrib.auth.models import User
 # Create your models here.
 class Aparcamiento(models.Model):
+    #idEntidad = models.IntegerField()
     nombre = models.CharField(max_length=32)
-    direccion = models.CharField(max_length=300)
+    contentUrl = models.URLField(max_length=300)
     descripcion = models.TextField()
-    latitud = models.FloatField()
-    longitud = models.FloatField()
     barrio = models.CharField(max_length=32)
     distrito = models.CharField(max_length=32)
-    contacto = models.TextField()
+    #nombreVia = models.CharField(max_length=64)
+    #claseVial = models.CharField(max_length=32)
+    #tipoNum = models.CharField(max_length=32, blank=True)
+    #num = models.CharField(max_length=32, blank=True)
+    accesibilidad = models.IntegerField(choices=((0, '0'), (1, '1')))
+    latitud = models.FloatField()
+    longitud = models.FloatField()
+    telefono = models.TextField()
+    email = models.TextField()
 
 class Comentario(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)
@@ -28,7 +35,3 @@ class Elegido(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)
     usuario = models.CharField(max_length=32)
     fecha = models.DateField(auto_now = True)
-
-
-
-#aparcamientos accesibles?

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<Contenidos>
+   {% for aparca,  in lista_aparcamientos %}
+   <contenido>
+      <atributos>
+         <atributo nombre="NOMBRE">{{aparca.nombre}}</atributo>
+         <atributo nombre="NOMBRE-VIA">{{aparca.nombreVia}}</atributo>
+
+      </atributos>
+   </contenido>
+   {% endfor %}
+</Contenidos>

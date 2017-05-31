@@ -9,8 +9,6 @@ from django.template.loader import get_template
 from django.template import Context
 from django.template import RequestContext
 from django.db.models import Count
-import xml.etree.ElementTree as ET
-from urllib.request import urlopen
 # Create your views here.
 
  # guarda los datos del xml en la base de datos
@@ -67,104 +65,152 @@ def cargar_datos(request):
         return HttpResponseRedirect("/")
 
 def ordenar_comentarios():
-    aparcamientos = Aparcamiento.objects.all()
-    dicc_aparcamiento_coment = {}
-    for aparcamiento in aparcamientos:
-        if aparcamiento.comentarios_set.count() != 0:
-            dicc_aparcamiento_coment[aparcamiento.nombre] = aparcamiento.comentarios_set.count()
+
+    aparcamientos_comentados = []
+    aparcamientos_populares = Aparcamiento.objects.annotate(quantity=Count('comentario')).order_by('-quantity')
+    if aparcamientos_populares[0].quantity > 0:
+        for i in range(5):
+            if aparcamientos_populares[i].quantity > 0:
+                aparca = aparcamiento.objects.get(nombre=aparcamientos_populares[i])
+                aparcamientos_comentados += {aparca}
+
+    return aparcamientos_comentados
+
+    #aparcamientos = Aparcamiento.objects.all()
+    #dicc_aparcamiento_coment = {}
+    #for aparcamiento in aparcamientos:
+    #    if aparcamiento.comentarios_set.count() != 0:
+    #        dicc_aparcamiento_coment[aparcamiento.nombre] = aparcamiento.comentarios_set.count()
           # cuenta los comentarios que hay y los guardo en un diccionario
             # siendo el aparcamiento la clave y el valor el numero de comentarios
-    if len(dicc_aparcamiento_coment) != 0:
-        list_aparca_coment = dicc_hotel_coment.items() #lo tengo que pasar a lista para poder ordenarlo
-        list_aparca_coment.sort(key=lambda x: x[1], reverse=True)
-        if len(list_aparca_coment) >= 5:
-            list_aparca_coment = list_aparca_coment[:10]
-    else:
-        list_aparca_coment = []
+    #if len(dicc_aparcamiento_coment) != 0:
+    #    list_aparca_coment = dicc_hotel_coment.items() #lo tengo que pasar a lista para poder ordenarlo
+    #    list_aparca_coment.sort(key=lambda x: x[1], reverse=True)
+    #    if len(list_aparca_coment) >= 5:
+    #        list_aparca_coment = list_aparca_coment[:10]
+    #else:
+    #    list_aparca_coment = []
 
-    return list_aparca_coment
+    #return list_aparca_coment
 
 def pag_principal(request):
-    #lista_aparcamientos = Aparcamiento.objects.all()
-    #if not lista_aparcamientos:
-    #    lista_aparcamientos = parsear_fichero('http://datos.munimadrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=202584-0-aparcamientos-residentes&mgmtid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&preview=full')
-    #    for aparcamiento in lista_aparcamientos: # aparcamiento es un diccionario
-    #        try:
-                #nombre = aparcamiento.get('NOMBRE')
-                #url = aparcamiento.get('CONTENT-URL')
-                #descripcion = aparcamiento.get('DESCRIPCION')
-                #barrio = aparcamiento.get('BARRIO')
-                #distrito = aparcamiento.get('DISTRITO')
-                #latitud = aparcamiento.get('LATITUD')
-                #longitud = aparcamiento.get('LONGITUD')
-                #accesibilidad = aparcamiento.get('ACCESIBILIDAD')
-                #telefono = aparcamiento.get('TELEFONO')
-                #email = aparcamiento.get('EMAIL')
-                #nuevo_aparc = Aparcamiento(nombre = nombre,contentUrl = url,
-                #                    descripcion = descripcion, barrio = barrio, distrito = distrito,
-                #                    latitud = latitud, longitud = longitud ,
-                #                    accesibilidad = accesibilidad, telefono = telefono, email = email)
-    #            nuevo_aparc = aparcamiento(nombre = aparcamiento["NOMBRE"],url = plaza["CONTENT-URL"],
-    #            descripcion = plaza["DESCRIPCION"], barrio = plaza["BARRIO"],
-    #            distrito = plaza["DISTRITO"], accesibilidad= plaza["ACCESIBILIDAD"],latitud = plaza["LATITUD"],
-    #            longitud = plaza["LONGITUD"])
-    #        except:
-    #            continue
-    #        nuevo_aparc.save()
-    if request.method == "GET":
-        if Aparcamiento.objects.count() == 0:
-            template = get_template('inicio.html')
-            context = RequestContext(request)
-            resp = template.render(context)
-        else:
+    lista_aparcamientos = Aparcamiento.objects.all()
+    accesibilidad = ''
+    if not lista_aparcamientos:
+        lista_aparcamientos = parsear_fichero('http://datos.munimadrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=202584-0-aparcamientos-residentes&mgmtid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&preview=full')
+        for aparcamiento in lista_aparcamientos: # aparcamiento es un diccionario
             try:
-                lista_usuarios = User.objects.all()
-                lista_titulos = []
-                for usu in lista_usuarios:
-                    try:
-                        cambio = Cambios.objects.get(usuario=usu.username)
-                        if cambio.titulo != '':
-                            titulo = cambio.titulo
-                        else:
-                            titulo = "Pagina de " + usu.username
-                        lista_titulos.append((titulo, usu.username))
-                    except:
-                        titulo = "Pagina de " + usu.username
-                        lista_titulos.append((titulo, usu.username))
+                nuevo_aparc = Aparcamiento(nombre = aparcamiento["NOMBRE"],contentUrl = aparcamiento["CONTENT-URL"],
+                descripcion = aparcamiento["DESCRIPCION"], barrio = aparcamiento["BARRIO"],
+                distrito = aparcamiento["DISTRITO"], accesibilidad= aparcamiento["ACCESIBILIDAD"],latitud = aparcamiento["LATITUD"],
+                longitud = aparcamiento["LONGITUD"], telefono= aparcamiento["TELEFONO"], email= aparcamiento["EMAIL"])
             except:
-                lista_usuarios = []
-            lista_nombres_aparcamientos = Aparcamiento.objects.annotate(
-                        num_com=Count('comentario')).order_by('-num_com')[:5]
+                try:
+                    nuevo_aparc = Aparcamiento(nombre = aparcamiento["NOMBRE"],contentUrl = aparcamiento["CONTENT-URL"],
+                    descripcion = aparcamiento["DESCRIPCION"], barrio = aparcamiento["BARRIO"],
+                    distrito = aparcamiento["DISTRITO"], accesibilidad= aparcamiento["ACCESIBILIDAD"],latitud = aparcamiento["LATITUD"],
+                    longitud = aparcamiento["LONGITUD"]) #hay algunos que no tienen telefono ni email
+                except:
+                    try:
+                        nuevo_aparc = Aparcamiento(nombre = aparcamiento["NOMBRE"],contentUrl = aparcamiento["CONTENT-URL"],
+                        descripcion = aparcamiento["DESCRIPCION"], barrio = aparcamiento["BARRIO"],
+                        distrito = aparcamiento["DISTRITO"], accesibilidad= aparcamiento["ACCESIBILIDAD"])
+                    except:
+                        continue
+
+
+            nuevo_aparc.save()
+    #ordenamos por comentarios
+    aparcamientos_comentados = ordenar_comentarios()
+    #aparcamientos_comentados = []
+    #aparcamientos_populares = Aparcamiento.objects.annotate(quantity=Count('comentario')).order_by('-quantity')
+    #if aparcamientos_populares[0].quantity > 0:
+    #    for i in range(5):
+    #        if aparcamientos_populares[i].quantity > 0:
+    #            aparca = aparcamiento.objects.get(nombre=aparcamientos_populares[i])
+    #            aparcamientos_comentados += {aparca}
+    #CONSTRUYE LISTA DE URL's DE USERS
+    #user_list = []
+    #users = User.objects.all()
+    #for user in users:
+    #    if str(user) != "superuser":
+    #        config = CSS.objects.get(user=user)
+    #        user_list += [(user, config.title)]
+    lista_usuarios = User.objects.all()
+    lista_titulos = []
+    for usu in lista_usuarios:
+        try:
+            cambio = Cambios.objects.get(usuario=usu.username)
+            if cambio.titulo != '':
+                titulo = cambio.titulo
+            else:
+                titulo = "Pagina de " + usu.username
+                lista_titulos.append((titulo, usu.username))
+        except:
+            titulo = "Pagina de " + usu.username
+            lista_titulos.append((titulo, usu.username))
+
+    #cargamos el html
+    template = get_template('pag_ppal.html')
+    context = RequestContext(request, {'aparcamientos_populares' : aparcamientos_comentados, 'lista_titulos': lista_titulos, 'accesibilidad': accesibilidad})
+        #context = RequestContext(request, {'lista_aparcamientos':  'lista_titulos'})
+    resp = template.render(context)
+    return HttpResponse(resp)
+
+    #if request.method == "GET":
+    #    if Aparcamiento.objects.count() == 0:
+    #        template = get_template('inicio.html')
+    #        context = RequestContext(request)
+    #        resp = template.render(context)
+    #    else:
+    #        try:
+    #            lista_usuarios = User.objects.all()
+    #            lista_titulos = []
+    #            for usu in lista_usuarios:
+    #                try:
+    #                    cambio = Cambios.objects.get(usuario=usu.username)
+    #                    if cambio.titulo != '':
+    #                        titulo = cambio.titulo
+    ##                    else:
+    #                        titulo = "Pagina de " + usu.username
+    #                    lista_titulos.append((titulo, usu.username))
+    #                except:
+    #                    titulo = "Pagina de " + usu.username
+    #                    lista_titulos.append((titulo, usu.username))
+    #        except:
+    #            lista_usuarios = []
+    #        lista_nombres_aparcamientos = Aparcamiento.objects.annotate(
+    #                    num_com=Count('comentario')).order_by('-num_com')[:5]
             #accesibilidad = False
             #lista_nombres_aparcamientos= ''
-            if len(lista_nombres_aparcamientos) == 0:
-                vacio = True
-            else:
-                vacio = False
-            lista_aparcamientos = []
+    #        if len(lista_nombres_aparcamientos) == 0:
+    #            vacio = True
+    #        else:
+    #            vacio = False
+    #        lista_aparcamientos = []
             #for nombre in lista_nombres_aparcamientos:
                 #aparcamiento = Aparcamiento.objects.get(nombre = nombre[0])
                 #lista_aparcamientos.append(aparcamiento)
-            template = get_template('pag_ppal.html')
-            context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'vacio': vacio})
-            resp = template.render(context)
+    #        template = get_template('pag_ppal.html')
+    #        context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'vacio': vacio})
+    #        resp = template.render(context)
 
-    elif request.method == "POST":
-        if "boton" in request.POST:
-            opcion = request.POST['boton']
-            if opcion == "Activar":
-                masComentados = Aparcamiento.objects.annotate(
-                                num_com=Count('comentario')).filter(
-                                accesibilidad=1).order_by('-num_com')[:5]
-                accesibilidad = True
-        else:
-            cargar_datos(request)
+    #elif request.method == "POST":
+    #    if "boton" in request.POST:
+    #        opcion = request.POST['boton']
+    #        if opcion == "Activar":
+    #            masComentados = Aparcamiento.objects.annotate(
+    #                            num_com=Count('comentario')).filter(
+    #                            accesibilidad=1).order_by('-num_com')[:5]
+    #            accesibilidad = True
+    #    else:
+    #        cargar_datos(request)
 
-        template = get_template('pag_ppal.html')
-        context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'accesibilidad': accesibilidad})
+    #    template = get_template('pag_ppal.html')
+    #    context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'lista_titulos': lista_titulos, 'accesibilidad': accesibilidad})
         #context = RequestContext(request, {'lista_aparcamientos':  'lista_titulos'})
-        resp = template.render(context)
-    return HttpResponse(resp)
+    #    resp = template.render(context)
+    #return HttpResponse(resp)
 
 def pag_usuario(request, usuario):
     try:
@@ -202,14 +248,16 @@ def pag_aparcamientos(request):
         aparcamientos = Aparcamiento.objects.all()
 
     elif request.method == 'POST':
-        distrito = request.body.split('&')[7].split('=')[1]
-        distrito = poner_espacios(categoria)[:-1]
-        aparcamientos = Aparcamiento.objects.filter(distrito = distrito)
+        distrito = request.POST.get('district')
+        if distrito != "None":
+            lista_aparcamientos = Aparcamiento.objects.filter(distrito=placeaccess)
+        else:
+            lista_aparcamientos = Aparcamiento.objects.all()
 
 
-    lista_aparca=[]
-    for aparc in aparcamientos:
-        lista_aparca.append((aparc.nombre, aparc.id))
+    #lista_aparca=[]
+    #for aparc in aparcamientos:
+    #    lista_aparca.append((aparc.nombre, aparc.id))
 
     template = get_template('pagina_aparcamientos.html')
     context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos})
@@ -296,8 +344,8 @@ def anadir_aparcamiento_pag(request, identificador):
 
 
 
-def pag_ppal_xml(request):
-    lista_nombres_aparcamientos = ordenar_maximos_comentarios()
+def pag_xml(request):
+    lista_nombres_aparcamientos = ordenar_comentarios()
     if len(lista_nombres_aparcamientos) == 0:
         vacio = True
     else:
@@ -305,7 +353,7 @@ def pag_ppal_xml(request):
     lista_aparcamientos = []
     for nombre in lista_nombres_aparcamientos:
         aparcamiento = Aparcamiento.objects.get(nombre = nombre[0])
-        lista_hoteles.append((hotel))
+        lista_aparcamientos.append((hotel))
     template = get_template('pag_ppal.xml')
     context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'vacio': vacio})
     return HttpResponse(template.render(context), content_type="text/xml")

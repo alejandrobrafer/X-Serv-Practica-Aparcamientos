@@ -14,31 +14,29 @@
 {% block contenido %}
 
 <div id="primarycontainer">
-   <br/><h3><center><em><u>Aparcamientos más comentados</u></em></center></h3><br/>
-   <div id="primarycontent">
-      <h1>LISTA DE LOS 5 APARCAMIENTOS MÁS COMENTADOS</h1>
-         <ul>
-         {%for aparca in aparcamientos_populares%}
-            <li><a href={{aparca.url}} ><strong>{{aparca.nombre}}</strong></a>
-                  <h4>Distrito: {{aparca.distrito}} | Barrio: {{aparca.barrio}}</h4>
-                  <p>{{aparca.descripcion}}</p>
-            </li>
-         {%empty%}
-             <h2>NO HAY COMENTARIOS EN NINGUN APARCAMIENTO</h2>
-                  <p>¡Sé el primero en comentar uno de ellos!</p>
-         <div class="divider2"></div>
-         {%endfor%}
-
-       </div>
-
-
-
-        <p>Si desea cargar el XML con el contenido de esta pagina&nbsp<a href="/ppal_xml">pulse aquí</a></p>
-
-      <h2>No hay ningun aparcamiento con comentarios</h2>
-    
-  </div>
+   {% if cargar %}
+      <form method="post" action="/">
+           <input class="cargar" type="submit" value="Cargar aparcamientos" name="cargar">
+      </form>
+   {% else %}
+      <h2>Aparcamientos más comentados:</h2>
+      {% for comentado in masComentados %}
+           {% if comentado.num_com > 0 %}
+               <h1><a href="{{ comentado.contentUrl }}">{{ comentado.nombre }}
+               </a></h1><p>{{ comentado.claseVial }} {{ comentado.nombreVia }},
+               {{ comentado.num}} {{ comentado.orientacion}}
+               {{ comentado.codigoPostal }} {{ comentado.localidad}}</p>
+               <p class="date">
+               <a href="/aparcamientos/{{ comentado.idEntidad }}">Más información
+               </a></p><br />
+           {% endif %}
+      {% endfor %}
+   {% endif %}
 </div>
+
+
+
+
 
 <div id="secondarycontent">
   <div>

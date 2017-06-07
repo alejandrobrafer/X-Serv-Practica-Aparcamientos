@@ -28,7 +28,7 @@ urlpatterns = [
     url(r'templates/styles\.css', views.css),
     url(r'^login$', views.login),
     url(r'^logout$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
-    url(r'^/aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
+    url(r'^aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
     url(r'^/aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
     url(r'^ppal_xml$', views.pag_xml),
     #url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),

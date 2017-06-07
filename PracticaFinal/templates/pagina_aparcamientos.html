@@ -15,57 +15,57 @@
 {% block contenido %}
 
   <div id="primarycontainer">
-    <br/><h3><center><em><u>Aparcamientos disponibles</u></em></center></h3><br/>
+    <br/><h3><center><em><u>Aparcamientos seleccionados</u></em></center></h3><br/>
     <br/><br/>
     <div id="primarycontent">
-      {% for aparca, id in lista_aparcamientos %}
-      <div class="post">
-        <p>{{aparca}}</p>
-        <div class="contentarea">
-          <ul class="controls">
-            <li><a href="/aparcamientos/{{id}}" class="more">Leer más</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="divider2"></div>
+      {% for aparcamiento in aparcamientos %}
+          <h1>{{ aparcamiento.nombre }}</h1>
+          <p><a href="/aparcamientos/{{ aparcamiento.idEntidad }}">
+          Enlace para ver su página</a></p><br /><br />
+          {% if user.is_authenticated %}
+              {% if aparcamiento.id not in elegidos %}
+                  <form class="eleccion" method="post" action="/aparcamientos">
+                      <!-- Mostrar un valor diferente del que se envía con un botón: -->
+                      <!-- http://stackoverflow.com/questions/5701831/input-type-button-label-vs-value -->
+                      <button type="submit" name="marcar"
+                      value="{{ aparcamiento.idEntidad }},{{ user.username }}"
+                      >Seleccionar</button>
+                  </form>
+              {% else %}
+                  <form class="eleccion" method="post" action="/aparcamientos">
+                      <button type="submit" name="desmarcar"
+                      value="{{ aparcamiento.idEntidad }},{{ user.username }}"
+                      >Dejar de seleccionar</button>
+                  </form>
+              {% endif %}
+          {% endif %}
       {% endfor %}
     </div>
   </div>
 
   <div id="secondarycontent">
     <div class="box">
-      <h4>Filtrar aparcamientos por:</h4>
-      <form action="/aparcamientos" method="post">
-      {% csrf_token %}
-      <p>Categoria:</p>
-      <select name="distrito">
-        <option>Todos</option>
-        <option>CENTRO</option>
-        <option>CHAMARTIN</option>
-        <option>TETUAN</option>
-        <option>MONCLOA-ARAVACA</option>
-        <option>RETIRO</option>
-        <option>SALAMANCA</option>
-        <option>MORATALAZ</option>
-        <option>CHAMBERI</option>
-        <option>SAN BLAS-CANILLEJAS</option>
-        <option>CIUDAD LINEAL</option>
-        <option>FUENCARRAL-EL PARDO</option>
-        <option>ARGANZUELA</option>
-        <option>VILLA DE VALLECAS</option>
-        <option>LATINA</option>
-        <option>HORTALEZA</option>
-        <option>PUENTE DE VALLECAS</option>
-        <option>TETUAN</option>
-        <option>CARABANCHEL</option>
-        <option>VILLAVERDE</option>
-        <option>BARAJAS</option>
-        <option>VICALVARO</option>
-        <option>USERA</option>
-      </select>
-      <br/><br/>
-      <input type="submit" value="Filtrar">
+      <h2>Filtrar aparcamientos por distrito:</h2>
+      <form method="post" action="/aparcamientos">
+          <select name="opciones">
+              {% for distrito in lista_distritos %}
+                  {% if distrito == "" %}
+                      <option value="">No especificado</option>
+                  {% else %}
+                      <option value="{{ distrito }}">{{ distrito }}</option>
+                  {% endif %}
+              {% endfor %}
+                  <option value="Todos" selected>Todos</option>
+          </select>
+          <input type="submit" name="filtro" value="Filtar">
       </form>
+      <hr />
+
+      {% if distrito == "" %}
+          <h2>Listado de aparcamientos: (No especificado)</h2>
+      {% else %}
+          <h2>Listado de aparcamientos: ({{ distrito }})</h2>
+      {% endif %}
     </div>
   </div>
 

@@ -177,71 +177,52 @@ def pag_aparcamientos(request):
                                         'elegidos': lista_elegidos})
     return HttpResponse(template.render(context))
 
-@csrf_exempt
-def aparcamientos(request):
-    plantilla = get_template('aparcamientos.html')
-    if request.method == "POST":
-        if "opciones" in request.POST:
-            distrito = request.POST['opciones']
-            if distrito == "Todos":
-                listaAparcamientos = Aparcamiento.objects.all()
-            else:
-                listaAparcamientos = Aparcamiento.objects.filter(
-                                     distrito=distrito)
-        else:
-            if "marcar" in request.POST:
-                recibido = request.POST['marcar']
-                idEntidad = recibido.split(',')[0]
-                nombreUsuario = recibido.split(',')[1]
-                aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
-                usuario = User.objects.get(username=nombreUsuario)
-                # Obtener la fecha y hora actual:
-                # http://stackoverflow.com/questions/37607411/django-runtimewarning-datetimefield-received-a-naive-datetime-while-time-zon
-                fechaHora = timezone.now()
-                nuevaSeleccion = Seleccione(aparcamiento=aparcamiento,
-                                            usuario=usuario,
-                                            fechaHora=fechaHora)
-                nuevaSeleccion.save()
-            else:
-                recibido = request.POST['desmarcar']
-                idEntidad = recibido.split(',')[0]
-                nombreUsuario = recibido.split(',')[1]
-                aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
-                usuario = User.objects.get(username=nombreUsuario)
-                borrarSeleccion = Seleccione.objects.get(
-                                  aparcamiento=aparcamiento, usuario=usuario)
-                borrarSeleccion.delete()
-
-
-    if request.method == "GET" or "opciones" not in request.POST:
-        listaAparcamientos = Aparcamiento.objects.all()
-        distrito = "Todos"
-
-
-    # Obtener todos los valores de la BD para un campo del modelo:
-    # http://stackoverflow.com/questions/6653382/python-django-load-column-from-database-into-list
-    listaDistritos = Aparcamiento.objects.all().values_list('distrito')
-
-    # Obtener los valores únicos de una lista:
-    # http://stackoverflow.com/questions/12897374/get-unique-values-from-a-list-in-python
-    listaDistritosUnicos = list(set(listaDistritos))
-
-    # Convertir lista de tuplas en lista:
-    # http://stackoverflow.com/questions/10941229/convert-list-of-tuples-to-list
-    listaDistritosUnicos = [distrito[0] for distrito in listaDistritosUnicos]
-
-    if request.user.is_authenticated():
-        seleccionados = Seleccione.objects.all().values_list(
-                        'aparcamiento').filter(usuario=request.user)
-        listaSeleccionados = [seleccionado[0] for seleccionado
-                              in seleccionados]
+def pag_aparcamiento(request, idEntidad):
+    aparcamiento = Aparcamiento.objects.get(idEntidad = idEntidad)
+    nombre = aparcamiento.nombre
+    comentarios = Comentario.objects.filter(aparcamiento = aparcamiento)
+    if len(comentarios) != 0:
+        Comentarios_vacio = False;
     else:
-        listaSeleccionados = ""
+        Comentarios_vacio = True;
+    try:
+        coment_usu = Comentario.objects.get(aparcamiento = aparcamiento, usuario = request.user.username)
+        NoComent = False
+    except Comentario.DoesNotExist:
+        NoComent = True
+    lista_comentarios=[]
+    for coment in comentarios:
+        lista_comentarios.append((coment.usuario, coment.texto, coment.fecha))
 
-    contexto = RequestContext(request, {'listaDistritos': listaDistritosUnicos,
-                                        'aparcamientos': listaAparcamientos,
-                                        'distrito': distrito,
-                                        'seleccionados': listaSeleccionados})
+    #visitas = contador_visitas(identificador)
+    #megustas = contador_megustas(identificador)
+    template = get_template('pag_aparcamiento.html')
+    #context = RequestContext(request, {'aparcamiento': aparcamiento,'comentarios': lista_comentarios, 'NoComent': NoComent, 'Comentarios_vacio': Comentarios_vacio, 'visitas': visitas, 'megustas': megustas})
+    context = RequestContext(request, {'aparcamiento': aparcamiento,'comentarios': lista_comentarios, 'NoComent': NoComent, 'Comentarios_vacio': Comentarios_vacio})
+    resp = template.render(context)
+    return HttpResponse(resp)
+
+@csrf_exempt
+def pagAparcamiento(request, idEntidad):
+    if request.method == "GET":
+        try:
+            aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+        except Aparcamiento.DoesNotExist:
+            plantilla = get_template('error.html')
+
+            return HttpResponse(plantilla.render(), status=404)
+
+    else:
+        comentario = request.POST['texto']
+        aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+        nuevoComentario = Comentario(texto=comentario,
+                                     aparcamiento=aparcamiento)
+        nuevoComentario.save()
+
+    plantilla = get_template('pag_aparcamiento.html')
+    comentarios = Comentario.objects.filter(aparcamiento=aparcamiento)
+    contexto = RequestContext(request, {'aparcamiento': aparcamiento,
+                              'comentarios': comentarios})
 
     return HttpResponse(plantilla.render(contexto))
 
@@ -277,28 +258,7 @@ def pag_usuario(request, usuario):
 
 
 
-def pag_aparcamiento(request, identificador):
-    aparcamiento = Aparcamiento.objects.get(id = int(identificador))
-    nombre = aparcamiento.nombre
-    comentarios = Comentario.objects.filter(hotel = aparcamiento)
-    if len(comentarios) != 0:
-        Comentarios_vacio = False;
-    else:
-        Comentarios_vacio = True;
-    try:
-        coment_usu = Comentario.objects.get(aparcamiento = aparcamiento, usuario = request.user.username)
-        NoComent = False
-    except ObjectDoesNotExist:
-        NoComent = True
-    lista_comentarios=[]
-    for coment in comentarios:
-        lista_comentarios.append((coment.usuario, coment.texto, coment.fecha))
 
-    visitas = contador_visitas(identificador)
-    megustas = contador_megustas(identificador)
-    template = get_template('pag_aparcamiento.html')
-    context = RequestContext(request, {'aparcamiento': aparcamiento,'comentarios': lista_comentarios, 'NoComent': NoComent, 'Comentarios_vacio': Comentarios_vacio, 'visitas': visitas, 'megustas': megustas})
-    return HttpResponse(template.render(context))
 
 
  # guarda los datos del xml en la base de datos
@@ -476,19 +436,16 @@ def poner_comentario(request, identificador):
 
 @csrf_exempt
 def login(request):
+    if request.method =="POST":
+        username = request.POST['username']
+        password = request.POST['password']
 
-    username = request.body.split('&')[1].split('=')[1]
-    password = request.body.split('&')[2].split('=')[1]
-
-    user = auth.authenticate(username=username, password=password)
-    if user is not None:
-        # Correct password, and the user is marked "active"
-        auth.login(request, user)
-        # Redirect to a success page.
-        return HttpResponseRedirect('/')
-    else:
-        template = get_template('error.html')
-        return HttpResponse(template.render(Context({'texto': "Usuario no autenticado"})))
+        user = auth.authenticate(username=username, password=password)
+        if user is not None:
+            # Correct password, and the user is marked "active"
+            auth.login(request, user)
+            # Redirect to a success page.
+    return HttpResponseRedirect('/')
 
 def anadir_aparcamiento_pag(request, identificador):
     try:

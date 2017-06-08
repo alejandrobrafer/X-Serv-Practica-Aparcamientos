@@ -21,7 +21,7 @@
       {% for aparcamiento in aparcamientos %}
           <h1>{{ aparcamiento.nombre }}</h1>
           <p><a href="/aparcamientos/{{ aparcamiento.idEntidad }}">
-          Enlace para ver su página</a></p><br /><br />
+          Pulse aquí para ver su página</a></p><br /><br />
           {% if user.is_authenticated %}
               {% if aparcamiento.id not in elegidos %}
                   <form class="eleccion" method="post" action="/aparcamientos">
@@ -62,9 +62,9 @@
       <hr />
 
       {% if distrito == "" %}
-          <h2>Listado de aparcamientos: (No especificado)</h2>
+          <h2>Listado de aparcamientos de: (No especificado)</h2>
       {% else %}
-          <h2>Listado de aparcamientos: ({{ distrito }})</h2>
+          <h2>Listado de aparcamientos de: ({{ distrito }})</h2>
       {% endif %}
     </div>
   </div>

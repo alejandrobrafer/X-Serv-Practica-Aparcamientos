@@ -2,7 +2,7 @@ from django.shortcuts import render
 from aparcamientos.models import Aparcamiento, Cambio, Comentario, Elegido
 from aparcamientos.parsear import parsear_fichero
 from django.contrib.auth.models import User
-from django.contrib import auth
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.template.loader import get_template
@@ -18,6 +18,7 @@ from django.utils import timezone
 @csrf_exempt
 def pag_principal(request):
     accesibilidad = True
+    aparcamientos_comentados = ''
     if request.method == "POST":
         if "boton" in request.POST:
             opcion = request.POST['boton']
@@ -86,8 +87,26 @@ def pag_principal(request):
         aparcamientos_comentados = Aparcamiento.objects.annotate(
                         num_com=Count('comentario')).order_by('-num_com')[:5]
         accesibilidad = False
-    lista_cambios = Cambio.objects.all()
-    lista_usuarios = User.objects.all()
+
+
+    try:
+        lista_usuarios = User.objects.all()
+        lista_titulos = []
+        for usu in lista_usuarios:
+            try:
+                mod = Cambio.objects.get(usuario=usu.username)
+                if mod.titulo != '':
+                    titulo = mod.titulo
+                else:
+                    titulo = "Pagina de " + usu.username
+                lista_titulos.append((titulo, usu.username))
+            except:
+                titulo = "Pagina de " + usu.username
+                lista_titulos.append((titulo, usu.username))
+    except:
+        lista_usuarios = []
+    #lista_cambios = Cambio.objects.all()
+    #lista_usuarios = User.objects.all()
     #if len(lista_cambios) != len(lista_usuarios):
     #    for usuario in lista_usuarios:
     #        try:
@@ -106,7 +125,7 @@ def pag_principal(request):
 
 
     template = get_template('pag_ppal.html')
-    context = RequestContext(request, {'lista_usuarios': lista_cambios,
+    context = RequestContext(request, {'lista_titulos': lista_titulos,
                                         'accesibilidad': accesibilidad,
                                         'aparcamientos_comentados': aparcamientos_comentados,
                                         'cargar': cargar})
@@ -117,6 +136,7 @@ def pag_principal(request):
 @csrf_exempt
 def pag_aparcamientos(request):
     lista_aparcamientos = ''
+    distrito = ''
     if request.method == 'POST':
         if "opciones" in request.POST:
             distrito = request.POST['opciones']
@@ -202,66 +222,114 @@ def pag_aparcamiento(request, idEntidad):
     resp = template.render(context)
     return HttpResponse(resp)
 
-@csrf_exempt
-def pagAparcamiento(request, idEntidad):
+def pag_usuario(request, usu):
     if request.method == "GET":
         try:
-            aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
-        except Aparcamiento.DoesNotExist:
-            plantilla = get_template('error.html')
+            usuario = User.objects.get(username=usu)
+        except User.DoesNotExist:
+            template = get_template('error.html')
+            return HttpResponse(template.render(), status=404)
 
-            return HttpResponse(plantilla.render(), status=404)
-
+        # Como obtener una query string:
+        # https://docs.djangoproject.com/en/1.8/ref/request-response/#django.http.HttpRequest.META
+        qs = request.META['QUERY_STRING']
     else:
-        comentario = request.POST['texto']
-        aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
-        nuevoComentario = Comentario(texto=comentario,
-                                     aparcamiento=aparcamiento)
-        nuevoComentario.save()
+        qs = ""
+        if request.user.is_authenticated():
+            usuario = User.objects.get(username=request.user.username)
+            try:
+                usuario = Cambio.objects.get(usuario=usuario)
+            except:
+                user = User.objects.get(username=request.user.username)
+                usuario = Cambio(usuario=user)
 
-    plantilla = get_template('pag_aparcamiento.html')
-    comentarios = Comentario.objects.filter(aparcamiento=aparcamiento)
-    contexto = RequestContext(request, {'aparcamiento': aparcamiento,
-                              'comentarios': comentarios})
-
-    return HttpResponse(plantilla.render(contexto))
-
-def pag_usuario(request, usuario):
-    try:
-        cambio = Cambio.objects.get(usuario=usuario)
-        titulo = cambio.titulo
-    except:
-        titulo = ''
-    aparc_usuario = Elegido.objects.filter(usuario = usuario)
-    lista_aparcamientos = []
-    for aparc in aparc_usuario:
-        fecha = aloj.fecha
-        aparcamiento = Aparcamiento.objects.get(nombre = aparc.aparcamiento.nombre)
-        #try:
-        #    fotos = Imagenes.objects.filter(hotel = hotel)
-        #except ObjectDoesNotExist:
-        #    fotos = []
-        #if len(fotos) == 0:
-        #    buena = ''
-        #for foto in fotos:
-        #    buena = foto.url
-        #lista_aparcamientos.append((hotel, buena, fecha))
-        lista_aparcamientos.append((aparcamiento))
-    if len(lista_aparcamientos) == 0:
-        vacio = True
-    else:
-        vacio = False
+            if 'titulo' in request.POST:
+                usuario.titulo = request.POST['titulo']
+            else:
+                usuario.letra = request.POST['letra']
+                usuario.color = request.POST['color']
+            usuario.save()
 
     template = get_template('pag_usuario.html')
-    context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'vacio': vacio, 'titulo': titulo, 'usuario':usuario})
-    return HttpResponse(template.render(context))
+    usuario = User.objects.get(username=usu)
+    if qs == "":
+        elegidos = Elegido.objects.filter(usuario=usuario)
+    else:
+        # Como extraer entradas utilizando los operadores de desigualdad:
+        # http://stackoverflow.com/questions/10040143/how-to-do-a-less-than-or-equal-to-filter-in-django-queryset
+        restantes = Elegido.objects.filter(id__gt=(int(qs)))
+        elegidos = restantes.filter(usuario=usuario)
+
+    if len(elegidos) <= 5:
+        fin = True
+    else:
+        fin = False
+
+    try:
+        usuario = Cambio.objects.get(usuario=usuario)
+    except:
+        usuario = ""
+
+    context = RequestContext(request, {'usuario': usuario,
+                                        'usu': usu,
+                                        'elegidos': elegidos,
+                                        'fin': fin})
+    resp = template.render(context)
+    return HttpResponse(resp)
+
+@csrf_exempt
+def login(request):
+    if request.method =="POST":
+        username = request.POST['username']
+        password = request.POST['password']
+
+        usuario = authenticate(username=username, password=password)
+        if usuario is not None:
+            # Correct password, and the user is marked "active"
+            if usuario.is_active:
+                login(request, usuario)
+    # Redirect to a success page.
+    return HttpResponseRedirect('/')
+
+
+@csrf_exempt
+def logout(request):
+    if request.method == "POST":
+        logout(request)
+    return HttpResponseRedirect('/')
+
+def pag_xml(request, usu):
+    try:
+        usuario = User.objects.get(username=usu)
+    except User.DoesNotExist:
+        template = get_template('error.html')
+
+        return HttpResponse(template.render(), status=404)
+
+    template = get_template('canal_usuario.xml')
+    elegidos = Elegido.objects.filter(usuario=usuario)
+    context = RequestContext(request, {'usuario': usuario,'elegidos': elegidos})
+    resp = template.render(context)
+
+    return HttpResponse(resp, content_type="text/xml")
 
 
 
 
 
 
- # guarda los datos del xml en la base de datos
+
+
+
+
+
+
+
+
+
+#A PARTIR DE AQUI NO VALE NADA DE MOMENTO
+
+# guarda los datos del xml en la base de datos
 def cargar_bd(request):
 
     datos = parsear_fichero('http://datos.munimadrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=202584-0-aparcamientos-residentes&mgmtid=e84276ac109d3410VgnVCM2000000c205a0aRCRD&preview=full')
@@ -434,18 +502,7 @@ def poner_comentario(request, identificador):
     else:
         return HttpResponse("Error")
 
-@csrf_exempt
-def login(request):
-    if request.method =="POST":
-        username = request.POST['username']
-        password = request.POST['password']
 
-        user = auth.authenticate(username=username, password=password)
-        if user is not None:
-            # Correct password, and the user is marked "active"
-            auth.login(request, user)
-            # Redirect to a success page.
-    return HttpResponseRedirect('/')
 
 def anadir_aparcamiento_pag(request, identificador):
     try:
@@ -462,19 +519,19 @@ def anadir_aparcamiento_pag(request, identificador):
 
 
 
-def pag_xml(request):
-    lista_nombres_aparcamientos = ordenar_comentarios()
-    if len(lista_nombres_aparcamientos) == 0:
-        vacio = True
-    else:
-        vacio = False
-    lista_aparcamientos = []
-    for nombre in lista_nombres_aparcamientos:
-        aparcamiento = Aparcamiento.objects.get(nombre = nombre[0])
-        lista_aparcamientos.append((hotel))
-    template = get_template('pag_ppal.xml')
-    context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'vacio': vacio})
-    return HttpResponse(template.render(context), content_type="text/xml")
+#def pag_xml(request):
+#    lista_nombres_aparcamientos = ordenar_comentarios()
+#    if len(lista_nombres_aparcamientos) == 0:
+#        vacio = True
+#    else:
+#        vacio = False
+#    lista_aparcamientos = []
+#    for nombre in lista_nombres_aparcamientos:
+#        aparcamiento = Aparcamiento.objects.get(nombre = nombre[0])
+#        lista_aparcamientos.append((hotel))
+#    template = get_template('pag_ppal.xml')
+#    context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos, 'vacio': vacio})
+#    return HttpResponse(template.render(context), content_type="text/xml")
 
 def css(request):
     usuario = request.user.username

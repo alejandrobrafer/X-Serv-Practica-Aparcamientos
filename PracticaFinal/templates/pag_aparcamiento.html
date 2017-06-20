@@ -5,10 +5,9 @@
 <ul>
   <a href="/"><li> Inicio </li></a>
   <a href="/aparcamientos"><li> Todos </li></a>
-  <a href="/about"><li> About </li></a>
   <a href="/{{user.username}}"><li>Página personal</li></a>
+  <a href="/about"><li> About </li></a>
   <a href="/{{user.username}}/xml"><li>XML</li></a>
-  <a href="/ranking"><li>Ranking</li></a>
 </ul>
 
 {% endblock %}
@@ -19,8 +18,53 @@
   <div id="normalcontent">
     <br/>
     <h1><strong>{{aparcamiento.nombre}}</strong></h1>
-    <h2><strong>{{aparcamiento.direccion}}</strong></h2>
-    <p>{{aparcamiento.descripcion | safe}}</p>
+    <h2>Características del aparcamiento:</h2>
+    <p><b>ID-ENTIDAD:</b> {{ aparcamiento.idEntidad}}<br>
+    <b>NOMBRE:</b> {{ aparcamiento.nombre }}<br>
+    <b>DESCRIPCIÓN:</b> {{aparcamiento.descripcion }}<br>
+    {% if aparcamiento.accesibilidad == 1 %}
+        <b>ACCESIBLE:</b> Sí<br>
+    {% else %}
+        <b>ACCESIBLE:</b> No<br>
+    {% endif %}
+    <b>URL:</b> <a href="{{ aparcamiento.contentUrl }}">{{ aparcamiento.contentUrl }}
+    </a><br>
+    <b>DIRECCIÓN:</b> {{ aparcamiento.claseVial }} {{ aparcamiento.nombreVia }},
+    {{ aparcamiento.num}} <br>
+
+    <b>BARRIO:</b> {{ aparcamiento.barrio }}<br>
+    {% if aparcamiento.distrito == "" %}
+        <b>DISTRITO:</b> No disponible<br>
+    {% else %}
+        <b>DISTRITO:</b> {{ aparcamiento.distrito }}<br>
+    {% endif %}
+    <b>COORDENADA X:</b> {{ aparcamiento.coordenadaX }}<br>
+    <b>COORDENADA Y:</b> {{ aparcamiento.coordenadaY }}<br>
+    {% if aparcamiento.latitud == "" or aparcamiento.latitud == None %}
+        <b>LATITUD:</b> No disponible<br>
+    {% else %}
+        <b>LATITUD:</b> {{ aparcamiento.latitud }}<br>
+    {% endif %}
+    {% if aparcamiento.longitud == "" or aparcamiento.longitud == None %}
+        <b>LONGITUD:</b> No disponible<br>
+    {% else %}
+        <b>LONGITUD:</b> {{ aparcamiento.longitud }}<br>
+    {% endif %}
+    {% if aparcamiento.telefono == "S/T" or aparcamiento.telefono == "T/D" %}
+        <b>TELÉFONO:</b> No disponible<br>
+    {% else %}
+        <b>TELÉFONO:</b> {{aparcamiento.telefono }}<br>
+    {% endif %}
+    {% if aparcamiento.email == "" %}
+        <b>EMAIL:</b> No disponible<br><br>
+    {% else %}
+        <b>EMAIL:</b> {{aparcamiento.email }}<br><br>
+    {% endif %}
+    <b>COMENTARIOS:</b><br>
+        {% for comentario in comentarios %}
+            - {{ comentario.texto}}<br>
+        {% endfor %}
+    <hr />
     <br/>
   </div>
 
@@ -42,27 +86,24 @@
       <div class="divider2"></div>
       <div class="post">
         <div class="contentarea">
-          <h2>Latitud y longitud:</h2>
-          {{aparcamiento.latitud}}<br/>
-          {{aparcamiento.longitud}}<br/>
-          <h2>Barrio y distrito:</h2>
-          {{aparcamiento.barrio}}<br/>
-          {{aparcamiento.distrito}}<br/>
         </div>
         <div class="divider2"></div>
       </div>
 
 
+      <h2>Introduce tu comentario:</h2>
+
+
+
       {% if user.is_authenticated %}
-        {% if NoComent %}
-          <div class="post">
+         {% if NoComent %}
+         <div class="post">
             <div class="contentarea">
-              {% csrf_token %}
-              <form action="/poner_comentario/{{aparcamiento.id}}" method="post">
-                <h2>¿Desea poner un comentario?</h2>
-                <textarea cols="60" rows="6" name="comentario">Escriba aqui su comentario...</textarea>
-                <br/>
-                <input type="submit" value="Enviar">
+               {% csrf_token %}
+               <form method="post" action="/aparcamientos/{{ aparcamiento.idEntidad }}">
+                  <h2>¿Desea poner un comentario?</h2>
+                  <input class="comentario" value="{{ form.texto }}" name="texto"><br>
+                  <input type="submit" value="Enviar">
               </form>
             </div>
           </div>
@@ -70,7 +111,6 @@
         {% endif %}
       {% endif %}
       {% if user.is_authenticated %}
-        <p>Si desea incluir este aparcamiento en su página personal&nbsp<a href="/anadir_a_pag/{{aparcamiento.id}}">pulse aquí</a></p>
         <p>Si desea cargar el canal RSS con los comentarios de este aparcamiento&nbsp<a href="/rss/{{aparcamiento.id}}">pulse aquí</a></p>
       {% endif %}
     </div>
@@ -78,20 +118,6 @@
 
 
   <div id="secondarycontent">
-    <div class="box">
-      <h3>Comentarios: </h3>
-      <div class="contentarea">
-        {% if not Comentarios_vacio %}
-          {% for usuario, texto, fecha in comentarios %}
-          <p><strong>{{usuario | safe}}</strong>&nbsp<sub>{{fecha}}</sub></p>
-          <p>{{texto | safe}}</p>
-          <br/> <br/>
-          {% endfor %}
-        {% else %}
-          <p>Sé el primero en poner un comentario!</p>
-        {% endif %}
-      </div>
-    </div>
     <div class="contentarea">
       <p><b>Visitas:</b>{{visitas}}</p>
     </div>

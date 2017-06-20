@@ -1,3 +1,4 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 
 <html>
@@ -25,15 +26,18 @@
     <div id="arriba_dcha">
       {% if user.is_authenticated %}
         <p>Bienvenid@, {{user.username}}!</p>
-        <a href="/logout"><input type="button" value="Logout" /></a>
+		  <form class="logout" method="post" action="/logout">
+			   <input type="submit" value="Logout">
+		  </form>
       {% else %}
-        <form method="POST" action="/login">
-        {% csrf_token %}
-        Usuario: <input type="username" name="username" /><br/>
-        Clave: <input type="password" name="password" /><br/>
-        <input type="submit" value="Login" />
-        </form>
-      {% endif %}
+		<form class="login" method="post" action="/login">
+			 <label for="username">Usuario: </label>
+			 <input value="{{ form.id }}" name="username"><br>
+			 <label for="password">Contraseña: </label>
+			 <input value="{{ form.password }}" name="password" type="password"><br>
+			 <input class="boton" type="submit" value="Login">
+		</form>
+  {% endif %}
     </div>
 
 
@@ -44,7 +48,7 @@
       {% block menu %} {% endblock %}
     </div>
 
-	 
+
 
     <!--esta es la parte que cambia segun la pagina-->
     <div id="contenido">

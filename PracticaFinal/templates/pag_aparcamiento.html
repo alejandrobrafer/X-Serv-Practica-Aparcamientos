@@ -5,8 +5,8 @@
 <ul>
   <a href="/"><li> Inicio </li></a>
   <a href="/aparcamientos"><li> Todos </li></a>
-  <a href="/{{user.username}}"><li>Página personal</li></a>
   <a href="/about"><li> About </li></a>
+  <a href="/{{user.username}}"><li>Página personal</li></a>
   <a href="/{{user.username}}/xml"><li>XML</li></a>
 </ul>
 
@@ -70,57 +70,12 @@
 
 
   <div id="primarycontainer">
-    <div id="primarycontent">
-      <div class="post">
-          <br/>
-          <div class="megusta">
-            <form method="get" action="/megusta/{{aparcamiento.id}}">
-              <button type="submit">
-                <img src="templates/images/corazon.jpg"/><sup><b>Me gusta</b></sup>
-              </button>
-              &nbsp&nbsp<img src="templates/images/cora.png" class="corazon"/>&nbsp<b>{{megustas}}</b>
-            </form>
-          </div>
-        </div>
-      </div>
-      <div class="divider2"></div>
-      <div class="post">
-        <div class="contentarea">
-        </div>
-        <div class="divider2"></div>
-      </div>
-
-
-      <h2>Introduce tu comentario:</h2>
-
-
-
-      {% if user.is_authenticated %}
-         {% if NoComent %}
-         <div class="post">
-            <div class="contentarea">
-               {% csrf_token %}
-               <form method="post" action="/aparcamientos/{{ aparcamiento.idEntidad }}">
-                  <h2>¿Desea poner un comentario?</h2>
-                  <input class="comentario" value="{{ form.texto }}" name="texto"><br>
-                  <input type="submit" value="Enviar">
-              </form>
-            </div>
-          </div>
-          <div class="divider2"></div>
-        {% endif %}
-      {% endif %}
-      {% if user.is_authenticated %}
-        <p>Si desea cargar el canal RSS con los comentarios de este aparcamiento&nbsp<a href="/rss/{{aparcamiento.id}}">pulse aquí</a></p>
-      {% endif %}
-    </div>
-  </div>
-
-
-  <div id="secondarycontent">
-    <div class="contentarea">
-      <p><b>Visitas:</b>{{visitas}}</p>
-    </div>
-  </div>
-
+     {% if user.is_authenticated %}
+         <h2>Introduce tu comentario:</h2>
+            <form method="post" action="/aparcamientos/{{ aparcamiento.idEntidad }}">
+            {% csrf_token %}
+            <input class="comentario" value="{{ form.texto }}" name="texto"><br>
+            <input type="submit" value="Enviar">
+         </form>
+     {% endif %}
 {% endblock %}

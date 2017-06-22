@@ -6,6 +6,7 @@ body {
 	font-family: 'Belgrano', serif;
 	font-size:14px;
 	background: #dedede;
+	background-color:{{ color|default:'#656565' }};
 	margin: 0;
 	padding: 0;
 	color: #656565;
@@ -41,6 +42,7 @@ h2 {
 	text-shadow: 0px 0px, 1px 2px #ffffff;
 }
 p {
+	font-size: {{letra}};
 	line-height:130%;
 }
 header {
@@ -158,10 +160,12 @@ nav {
 	border-radius:5px 5px 0 0;
 }
 #navlist li a:link {
-	color: #e8c637;
+	background-color:{{ color|default:'#e8c637' }};
+	/*color: #e8c637;*/
 }
 #navlist li a:hover {
-	color: #363636;
+	background-color:{{ color|default:'#363636' }};
+	/*color: #363636;*/
 	background: #dedede;
 	border-color: #227;
 }
@@ -254,7 +258,6 @@ img {
 #menu
 {
 position: relative;
-/*background: #7F8400 url('zenlike/images/menubg.gif') repeat-x top left;*/
 background-color: #48D1CC;
 height: 3.5em;
 padding: 0em 1.0em 0em 1.0em;
@@ -289,13 +292,6 @@ font-size: 2.0em;
 border-right: 1px solid #191970;
 text-decoration: none;
 }
-
-/*#menu ul li a:hover
-{
-text-decoration: overline;
-}*/
-
-
 
 #arriba_dcha
 {

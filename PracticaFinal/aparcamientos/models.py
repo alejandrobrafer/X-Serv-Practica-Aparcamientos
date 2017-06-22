@@ -25,12 +25,9 @@ class Aparcamiento(models.Model):
 class Comentario(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)
     texto = models.TextField()
-    usuario = models.CharField(max_length=32)
-    fecha = models.DateField(auto_now = True)
 
 class Cambio(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    #usuario = models.ForeignKey(User)
+    usuario = models.CharField(max_length=32)
     titulo = models.CharField(max_length=64, default='')
     letra = models.CharField(max_length=64, null=True, blank=True)
     color = models.CharField(max_length=32)

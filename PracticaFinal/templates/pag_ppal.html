@@ -20,7 +20,7 @@
       </form>
    {% else %}
       <h2>Aparcamientos más comentados:</h2>
-      {% for comentado in masComentados %}
+      {% for comentado in aparcamientos_comentados %}
            {% if comentado.num_com > 0 %}
                <h1><a href="{{ comentado.contentUrl }}">{{ comentado.nombre }}
                </a></h1><p>{{ comentado.claseVial }} {{ comentado.nombreVia }},
@@ -33,10 +33,6 @@
       {% endfor %}
    {% endif %}
 </div>
-
-
-
-
 
 <div id="secondarycontent">
   <div>
@@ -56,17 +52,17 @@
       </div>
 
       <h2>Botón de accesibilidad</h2>
-        {% if accesibilidad %}
-            <p>Pulse para ver los aparcamientos accesibles</p>
-            <form method="post" action="/">
+         {% if accesibilidad %}
+             <p>Pulse si solo desea ver los aparcamientos accesibles</p>
+             <form method="post" action="/">
                 <input type="submit" value="Desactivar" name="boton">
-            </form>
-        {% else %}
-            <p>Pulse para ver los aparcamientos accesibles</p>
-            <form method="post" action="/">
+             </form>
+         {% else %}
+             <p>Pulse si solo desea ver los aparcamientos accesibles</p>
+             <form method="post" action="/">
                 <input type="submit" value="Activar" name="boton">
-            </form>
-        {% endif %}
+             </form>
+         {% endif %}
     <hr />
     </div>
   </div>

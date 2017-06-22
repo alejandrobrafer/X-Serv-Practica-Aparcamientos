@@ -23,7 +23,7 @@
       {{ elegido.aparcamiento.num}}</p>
       <p class="date">
       <a href="/aparcamientos/{{ elegido.aparcamiento.idEntidad }}">Más información</a></p>
-      <p>Seleccionado en: {{ seleccionado.fechaHora}}</p>
+      <p>Seleccionado en: {{ elegido.fecha}}</p>
       <br /><br />
       <!--Para saber por qué pasada vamos-->
       {% if forloop.counter == 5 and not fin %}
@@ -33,99 +33,63 @@
    {% endfor %}
 </div>
 
-<!--
-<div id="secondarycontent">
-   <div class="box">
-      {% if usuario == "" or usuario.titulo == "" %}
-          <h2>"Página de {{ nombreUsuario }}"</h2>
-          <h2>"He entrado en el primer if"</h2>
-      {% else %}
-          <h2>"{{ usuario.titulo }}"</h2>
-          <h2>"He entrado en el segundo if"</h2>
-      {% endif %}
-      <hr />
-      {% if user.is_authenticated and user.username == nombreUsuario %}
-          {% csrf_token %}
-          <h2>¿Desea cambiar el estilo?</h2>
-          <form method="post" action="/{{ user.username }}">
-              <label for="size">Tamaño letra:</label>
-              <input value="{{ form.letra }}" name="letra"><br>
-              <label for="size">Color:</label>
-              <input value="{{ form.color }}" name="color"><br><br>
-              <input type="submit" value="Enviar">
-          </form>
-          <hr />
-
-          <h2> Ponle título a tu página!</h2>
-          <form method="post" action="/{{ user.username }}">
-              <label for="size">Título:</label>
-              <input value="{{ form.titulo }}" name="titulo"><br><br>
-              <input type="submit" value="Enviar">
-          </form>
-          <hr />
-      {% endif %}
-</div>-->
+<div id = "primarycontent">
+   {% if usuario == "" or usuario.titulo == "" %}
+      <h2>"Página de {{ usu }}"</h2>
+   {% else %}
+      <h2>"{{ usuario.titulo }}"</h2>
+   {% endif %}
+   <hr />
 
 
-{% if usuario == user.username %}
-<div id="secondarycontent">
-  <div class="box">
-    <h4>Ponle título a tu página!</h4>
-    <form method="POST" action="/cambiar_titulo">
-    {% csrf_token %}
-    <input type="text" name="titulo" /><br/>
-    <input type="submit" value="Cambiar" />
-    </form>
-  </div>
-</div>
-
-<div id="secondarycontent">
-  <div class="box">
-     <h4>Ponle título a tu página!</h4>
-     <form method="post" action="/{{ user.username }}">
-         <label for="size">Título:</label>
-         <input value="{{ form.titulo }}" name="titulo"><br><br>
-         <input type="submit" value="Enviar">
-     </form>
-    <h4>¿Desea cambiar el estilo?</h4>
-    <form action="/templates/styles.css" method="post">
-    {% csrf_token %}
-    <p>Color de fondo:</p>
-    <select name="color">
-      <option>PorDefecto</option>
-      <option value="red">Rojo</option>
-      <option value="blue">Azul</option>
-      <option value="green">Verde</option>
-      <option value="yellow">Amarillo</option>
-      <option value="pink">Rosa</option>
-      <option value="purple">Morado</option>
-      <option value="black">Negro</option>
-      <option value="grey">Gris</option>
-      <option value="#48D1CC">Turquesa</option>
-      <option value="brown">Marrón</option>
-      <option value="beige">Beige</option>
-      <option value="#8A2BE2">Violeta</option>
-      <option value="#87CEFA">Cielo</option>
-      <option value="#00FF00">Lima</option>
-    </select>
-    <br/><br/>
-    <p>Tamaño de letra:</p>
-    <select name="letra">
-      <option>PorDefecto</option>
-      <option>0.3em</option>
-      <option>0.5em</option>
-      <option>0.8em</option>
-      <option>1.0em</option>
-      <option>1.5em</option>
-      <option>2.0em</option>
-      <option>2.5em</option>
-      <option>3.0em</option>
-    </select>
-    <br/><br/>
-    <input type="submit" value="Cambiar">
-    </form>
-  </div>
-</div>
-{% endif %}
+   {% if usu == user.username %}
+      <div class="box">
+       <h4>Ponle título a tu página!</h4>
+       <form method="POST" action="/cambiar_titulo">
+       {% csrf_token %}
+       <input type="text" name="titulo" /><br/>
+       <input type="submit" value="Cambiar" />
+       </form>
+     </div>
+     <div class="box">
+       <h4>¿Desea cambiar el estilo?</h4>
+       <form action="/templates/styles.css" method="post">
+       {% csrf_token %}
+       <p>Color de fondo:</p>
+       <select name="color">
+         <option>PorDefecto</option>
+         <option value="red">Rojo</option>
+         <option value="blue">Azul</option>
+         <option value="green">Verde</option>
+         <option value="yellow">Amarillo</option>
+         <option value="pink">Rosa</option>
+         <option value="purple">Morado</option>
+         <option value="black">Negro</option>
+         <option value="grey">Gris</option>
+         <option value="#48D1CC">Turquesa</option>
+         <option value="brown">Marrón</option>
+         <option value="beige">Beige</option>
+         <option value="#8A2BE2">Violeta</option>
+         <option value="#87CEFA">Cielo</option>
+         <option value="#00FF00">Lima</option>
+       </select>
+       <br/><br/>
+       <p>Tamaño de letra:</p>
+       <select name="letra">
+         <option>PorDefecto</option>
+         <option>0.3em</option>
+         <option>0.5em</option>
+         <option>0.8em</option>
+         <option>1.0em</option>
+         <option>1.5em</option>
+         <option>2.0em</option>
+         <option>2.5em</option>
+         <option>3.0em</option>
+       </select>
+       <br/><br/>
+       <input type="submit" value="Cambiar">
+       </form>
+     </div>
+   {% endif %}
 
 {% endblock %}

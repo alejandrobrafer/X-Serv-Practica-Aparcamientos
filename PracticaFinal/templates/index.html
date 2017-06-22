@@ -23,21 +23,18 @@
 
 
     <!--parte de arriba a la derecha-->
-    <div id="arriba_dcha">
+	 <div id="arriba_dcha">
       {% if user.is_authenticated %}
         <p>Bienvenid@, {{user.username}}!</p>
-		  <form class="logout" method="post" action="/logout">
-			   <input type="submit" value="Logout">
-		  </form>
+        <a href="/logout"><input type="button" value="Logout" /></a>
       {% else %}
-		<form class="login" method="post" action="/login">
-			 <label for="username">Usuario: </label>
-			 <input value="{{ form.id }}" name="username"><br>
-			 <label for="password">Contraseña: </label>
-			 <input value="{{ form.password }}" name="password" type="password"><br>
-			 <input class="boton" type="submit" value="Login">
-		</form>
-  {% endif %}
+        <form method="POST" action="/login">
+        {% csrf_token %}
+        Usuario: <input type="username" name="username" /><br/>
+        Clave: <input type="password" name="password" /><br/>
+        <input type="submit" value="Login" />
+        </form>
+      {% endif %}
     </div>
 
 

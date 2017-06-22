@@ -405,6 +405,13 @@ def contador_megustas(idEntidad):
         megustas = 0
     return megustas
 
+def rss(request):
+    comentarios = Comentario.objects.all()
+    template = get_template('canal.rss')
+    context = RequestContext(request, {'comentarios': comentarios})
+    resp = template.render(context)
+    return HttpResponse(resp,content_type="text/rss+xml")
+
 #def populares(request):
 #    todos_aparcamientos = Aparcamiento.objects.all()
 #    lista = []

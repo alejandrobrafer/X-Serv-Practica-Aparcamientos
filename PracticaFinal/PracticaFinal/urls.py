@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
     #url(r'^populares$', views.populares, name= "Ranking de popularidad"),
     #url(r'^ppal_xml$', views.pag_xml),
+    url(r'^rss/?$', views.rss, name='Canal RSS para los comentarios puestos'),
     url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),
     url(r'^(.*)$', views.pag_usuario, name= "Pagina personal de un usuario"),
 ]

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+    <title>Comentarios</title>
+    <link>http://localhost:1234</link>
+    <description>Comentarios en aparcamientos</description>
+    {% for comentario in comentarios %}
+    <item>
+        <title>{{ comentario.aparcamiento.nombre }}</title>
+        <link>http://localhost:1234/aparcamientos/{{ comentario.aparcamiento.idEntidad }}</link>
+        <description>{{ comentario.texto }}</description>
+    </item>
+    {% endfor %}
+</channel>
+</rss>

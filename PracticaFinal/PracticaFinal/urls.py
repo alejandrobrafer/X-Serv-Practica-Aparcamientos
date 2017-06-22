@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'aparcamientos/templates/styles\.css$', views.css),
     url(r'.*/templates/styles\.css$', views.css),
     url(r'^cambiar_titulo', views.cambiar_titulo),
+    url(r'megusta/(\d+)$', views.anadir_megusta),
     url(r'.*/images/(?P<path>.*)$', 'django.views.static.serve', {'document_root': 'templates/images/'}),
     url(r'^login/?$', views.login, name="Login de usuarios"),
     url(r'^logout/?$', 'django.contrib.auth.views.logout', {'next_page': '/'}),

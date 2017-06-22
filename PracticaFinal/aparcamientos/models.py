@@ -37,3 +37,7 @@ class Elegido(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)
     usuario = models.CharField(max_length=32)
     fecha = models.DateField(auto_now = True)
+
+class Megusta(models.Model):
+    aparcamiento = models.ForeignKey(Aparcamiento)
+    usuario = models.CharField(max_length=32)

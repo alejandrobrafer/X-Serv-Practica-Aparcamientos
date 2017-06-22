@@ -77,5 +77,13 @@
             <input class="comentario" value="{{ form.texto }}" name="texto"><br>
             <input type="submit" value="Enviar">
          </form>
+         <div class="megusta">
+           <form method="get" action="/megusta/{{aparcamiento.idEntidad}}">
+             <button type="submit">
+               <img src="templates/images/corazon.jpg"/><sup><b>Me gusta</b></sup>
+             </button>
+             &nbsp&nbsp<img src="templates/images/cora.png" class="corazon"/>&nbsp<b>{{megustas}}</b>
+           </form>
+         </div>
      {% endif %}
 {% endblock %}

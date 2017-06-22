@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from aparcamientos.models import Aparcamiento, Cambio, Comentario, Elegido
+from aparcamientos.models import Aparcamiento, Cambio, Comentario, Elegido, Megusta
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.auth import authenticate,login, logout
@@ -176,6 +176,7 @@ def pag_aparcamiento(request, idEntidad):
     if request.method == "GET":
         try:
             aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+
         except Aparcamiento.DoesNotExist:
             template = get_template('error.html')
             return HttpResponse(plantilla.render(), status=404)
@@ -184,11 +185,12 @@ def pag_aparcamiento(request, idEntidad):
         aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
         nuevoComentario = Comentario(aparcamiento=aparcamiento,texto=comentario)
         nuevoComentario.save()
-
+    megustas = contador_megustas(idEntidad)
     template = get_template('pag_aparcamiento.html')
     comentarios = Comentario.objects.filter(aparcamiento=aparcamiento)
     context = RequestContext(request, {'aparcamiento': aparcamiento,
-                              'comentarios': comentarios})
+                              'comentarios': comentarios,
+                              'megustas': megustas})
 
     resp = template.render(context)
     return HttpResponse(resp)
@@ -375,3 +377,27 @@ def about(request):
     template = get_template('about.html')
     context = RequestContext(request)
     return HttpResponse(template.render(context))
+
+def anadir_megusta(request, idEntidad):
+    usu_id = request.user.id
+    if usu_id == None:
+        usu_id = request.COOKIES['sessionid']
+    aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+    try:
+        d = Megusta.objects.get(aparcamiento=aparcamiento, usuario=usu_id)
+        #no hay que hacer nada, una misma persona no puede poner mas de un me gusta en un mismo alojamiento
+    except:
+        like = Megusta(aparcamiento=aparcamiento, usuario=usu_id)
+        like.save()
+
+    direccion = '/aparcamientos/' + idEntidad
+    return HttpResponseRedirect(direccion)
+
+def contador_megustas(idEntidad):
+    try:
+        aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+        megustas = aparcamiento.megusta_set.count()
+
+    except:
+        megustas = 0
+    return megustas

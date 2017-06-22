@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^logout/?$', 'django.contrib.auth.views.logout', {'next_page': '/'}),
     url(r'^aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
     url(r'^aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
+    #url(r'^populares$', views.populares, name= "Ranking de popularidad"),
     #url(r'^ppal_xml$', views.pag_xml),
     url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),
     url(r'^(.*)$', views.pag_usuario, name= "Pagina personal de un usuario"),

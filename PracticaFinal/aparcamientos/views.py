@@ -397,7 +397,28 @@ def contador_megustas(idEntidad):
     try:
         aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
         megustas = aparcamiento.megusta_set.count()
-
+        #aparcamiento.megustas += 1
+        #megustas +=1
+        #megustas = aparcamiento.megustas
+        #aparcamiento.save()
     except:
         megustas = 0
     return megustas
+
+#def populares(request):
+#    todos_aparcamientos = Aparcamiento.objects.all()
+#    lista = []
+#    try:
+#        for aparcamiento in todos_aparcamientos:
+            #aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
+            #megustas = aparcamiento.megusta_set.count()
+#            lista.append((aparcamiento.nombre, aparcamiento.megustas_set.count(), aparcamiento.idEntidad))
+#            lista.sort(key=lambda x: x[1], reverse=True)
+#    except:
+#        lista.append((aparcamiento.nombre, aparcamiento.megustas, aparcamiento.idEntidad))
+#        lista.sort(key=lambda x: x[1], reverse=True)
+
+#    template = get_template('populares.html')
+#    context = RequestContext(request, {'lista':lista})
+#    resp = template.render(context)
+#    return HttpResponse(resp)

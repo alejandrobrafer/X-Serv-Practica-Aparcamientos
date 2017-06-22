@@ -6,7 +6,7 @@
    <a href="/aparcamientos"><li> Todos </li></a>
    <a href="/about"><li> About </li></a>
    <a href="/{{user.username}}"><li>Página personal</li></a>
-   <a href="/{{user.username}}/xml"><li>XML</li></a>
+   <a href="/{{user.username}}/xml"><li>XML usuario</li></a>
 </ul>
 {% endblock %}
 
@@ -24,8 +24,7 @@
            {% if comentado.num_com > 0 %}
                <h1><a href="{{ comentado.contentUrl }}">{{ comentado.nombre }}
                </a></h1><p>{{ comentado.claseVial }} {{ comentado.nombreVia }},
-               {{ comentado.num}} {{ comentado.orientacion}}
-               {{ comentado.codigoPostal }} {{ comentado.localidad}}</p>
+               {{ comentado.num}} {{ comentado.codigoPostal }} {{ comentado.localidad}}</p>
                <p class="date">
                <a href="/aparcamientos/{{ comentado.idEntidad }}">Más información
                </a></p><br />

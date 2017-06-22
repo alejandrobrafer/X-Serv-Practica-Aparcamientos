@@ -8,7 +8,7 @@
   <a href="/aparcamientos"><li> Todos </li></a>
   <a href="/about"><li> About </li></a>
   <a href="/{{user.username}}"><li>Página personal</li></a>
-  <a href="/{{user.username}}/xml"><li>XML</li></a>
+  <a href="/{{user.username}}/xml"><li>XML usuario</li></a>
 </ul>
 {% endblock %}
 
@@ -24,11 +24,13 @@
     <p> Esta aplicación web aglutina información sobre aparcamientos en la ciudad de Madrid.<br/>
       Descarga dicha información en formato XML del portal de datos abiertos de Madrid y, asi,
       los ofrece a los usuarios para que puedan seleccionar aquellos que les parecen más
-      interesantes o que se ajusta más a sus necesidades. <br/> Además todo aquel que se cree una
-      cuenta personal en la aplicación podrá comentar sobre los aparcamientos que quiera
-      <br/>Los usuarios registrados también tienen la posibilidad de personalizar el estilo de la página,
-       cambiando el color de fondo y la letra y elegir el título de su página personal.</p>
-      <br/><p>Como funcionalidad optativa, se incluye </p>
+      interesantes.<br/> Además todo aquel que se cree una cuenta personal en la aplicación
+      podrá comentar sobre los aparcamientos que quiera y también tienen la posibilidad de
+      personalizar el estilo de la página,cambiando el color de fondo y la letra y elegir el
+      título de su página personal. También es posible filtrar los aparcamientos por distrito,
+      y activar los que son accesibles. Por último es posible dar like a los mismos. </p>
+      <br/><p>Como funcionalidad optativa, se incluye la inclusión del favicon, el formulario
+      para poner comentarios. </p>
   </div>
 
 {% endblock %}

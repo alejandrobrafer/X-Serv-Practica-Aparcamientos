@@ -185,12 +185,15 @@ def pag_aparcamiento(request, idEntidad):
         aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
         nuevoComentario = Comentario(aparcamiento=aparcamiento,texto=comentario)
         nuevoComentario.save()
+
+    visitas = contador_visitas(idEntidad)
     megustas = contador_megustas(idEntidad)
     template = get_template('pag_aparcamiento.html')
     comentarios = Comentario.objects.filter(aparcamiento=aparcamiento)
     context = RequestContext(request, {'aparcamiento': aparcamiento,
                               'comentarios': comentarios,
-                              'megustas': megustas})
+                              'megustas': megustas,
+                              'visitas':visitas})
 
     resp = template.render(context)
     return HttpResponse(resp)
@@ -397,10 +400,6 @@ def contador_megustas(idEntidad):
     try:
         aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
         megustas = aparcamiento.megusta_set.count()
-        #aparcamiento.megustas += 1
-        #megustas +=1
-        #megustas = aparcamiento.megustas
-        #aparcamiento.save()
     except:
         megustas = 0
     return megustas
@@ -412,20 +411,58 @@ def rss(request):
     resp = template.render(context)
     return HttpResponse(resp,content_type="text/rss+xml")
 
-#def populares(request):
-#    todos_aparcamientos = Aparcamiento.objects.all()
-#    lista = []
-#    try:
-#        for aparcamiento in todos_aparcamientos:
-            #aparcamiento = Aparcamiento.objects.get(idEntidad=idEntidad)
-            #megustas = aparcamiento.megusta_set.count()
-#            lista.append((aparcamiento.nombre, aparcamiento.megustas_set.count(), aparcamiento.idEntidad))
-#            lista.sort(key=lambda x: x[1], reverse=True)
-#    except:
-#        lista.append((aparcamiento.nombre, aparcamiento.megustas, aparcamiento.idEntidad))
-#        lista.sort(key=lambda x: x[1], reverse=True)
+def contador_visitas(idEntidad):
+    aparcamiento = Aparcamiento.objects.get(idEntidad = idEntidad)
+    aparcamiento.visitas += 1
+    visitas = aparcamiento.visitas
+    aparcamiento.save()
+    return visitas
 
-#    template = get_template('populares.html')
-#    context = RequestContext(request, {'lista':lista})
-#    resp = template.render(context)
-#    return HttpResponse(resp)
+def ranking_visitas(request):
+    todos_aparcamientos = Aparcamiento.objects.all()
+    lista = []
+    for aparcamiento in todos_aparcamientos:
+        lista.append((aparcamiento.nombre, aparcamiento.visitas, aparcamiento.idEntidad))
+
+    lista.sort(key=lambda x: x[1], reverse=True)
+
+    template = get_template('visitados.html')
+    context = RequestContext(request, {'lista':lista})
+    resp = template.render(context)
+    return HttpResponse(resp)
+
+def pag_ppal_xml(request, usu):
+
+    try:
+        usuario = User.objects.get(username=usu)
+    except User.DoesNotExist:
+        template = get_template('error.html')
+
+        return HttpResponse(template.render(), status=404)
+
+    template = get_template('canal_usuario.xml')
+    elegidos = Elegido.objects.filter(usuario=usuario)
+    context = RequestContext(request, {'usuario': usuario,'elegidos': elegidos})
+    resp = template.render(context)
+
+    return HttpResponse(resp, content_type="text/xml")
+
+def pag_ppal_xml(request):
+    aparcamientos_comentados = Aparcamiento.objects.annotate(
+                    num_com=Count('comentario')).order_by('-num_com')[:5]
+    template = get_template('pag_ppal.xml')
+    context = RequestContext(request, {'aparcamientos_comentados': aparcamientos_comentados})
+    resp = template.render(context)
+    return HttpResponse(resp, content_type="text/xml")
+    #aparcamientos_comentados = Aparcamiento.objects.annotate(
+    #                num_com=Count('comentario')).order_by('-num_com')[:5]
+    #lista_aparcamientos = []
+    #for nombre in aparcamientos_comentados:
+    #    aparcamientos = Aparcamiento.objects.filter(nombre=nombre)
+
+    #    lista_aparcamientos.append((aparcamientos))
+    #template = get_template('pag_ppal.xml')
+    #context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos,
+    #                                    'aparcamientos':aparcamientos})
+    #resp = template.render(context)
+    #return HttpResponse(resp, content_type="text/xml")

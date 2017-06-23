@@ -21,7 +21,7 @@ class Aparcamiento(models.Model):
     longitud = models.FloatField(null=True, blank=True)
     telefono = models.TextField()
     email = models.TextField()
-    #megustas = models.IntegerField(default=0)
+    visitas = models.IntegerField(default=0)
 
 class Comentario(models.Model):
     aparcamiento = models.ForeignKey(Aparcamiento)

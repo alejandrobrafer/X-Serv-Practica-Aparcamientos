@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-
-<Contenidos>
-   {% for aparca,  in lista_aparcamientos %}
-   <contenido>
-      <atributos>
-         <atributo nombre="NOMBRE">{{aparca.nombre}}</atributo>
-         <atributo nombre="NOMBRE-VIA">{{aparca.nombreVia}}</atributo>
-
-      </atributos>
-   </contenido>
-   {% endfor %}
-</Contenidos>
+   <aparcamientos>
+      <titulo> Canal XML de la página principal</titulo>
+      {% for aparcamiento in aparcamientos_comentados %}
+         <aparcamiento>
+            <nombre>{{aparcamiento.nombre}}</nombre>
+            <nombreVia>{{ aparcamiento.nombreVia }}</nombreVia>
+            <claseVial>{{ aparcamiento.claseVial }}</claseVial>
+            <tipoNum>{{ aparcamiento.tipoNum }}</tipoNum>
+            <num>{{ aparcamiento.num }}</num>
+         </aparcamiento>
+      {% endfor %}
+   </aparcamientos>

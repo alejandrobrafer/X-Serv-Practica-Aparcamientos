@@ -8,6 +8,7 @@
    <a href="/{{user.username}}"><li>Página personal</li></a>
    <a href="/{{user.username}}/xml"><li>XML usuario</li></a>
    <a href="/rss"><li>Canal RSS </li></a>
+   <a href="/visitados"><li>Más visitados</li></a>
 </ul>
 {% endblock %}
 
@@ -25,12 +26,13 @@
            {% if comentado.num_com > 0 %}
                <h1><a href="{{ comentado.contentUrl }}">{{ comentado.nombre }}
                </a></h1><p>{{ comentado.claseVial }} {{ comentado.nombreVia }},
-               {{ comentado.num}} {{ comentado.codigoPostal }} {{ comentado.localidad}}</p>
+               {{ comentado.num}} </p>
                <p class="date">
                <a href="/aparcamientos/{{ comentado.idEntidad }}">Más información
                </a></p><br />
            {% endif %}
       {% endfor %}
+      <h3>Si desea cargar el XML con el contenido de esta página&nbsp<a href="/ppal_xml">pulse aquí</a></h3>
    {% endif %}
 </div>
 

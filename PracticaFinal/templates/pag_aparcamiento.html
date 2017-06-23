@@ -9,6 +9,7 @@
   <a href="/{{user.username}}"><li>Página personal</li></a>
   <a href="/{{user.username}}/xml"><li>XML usuario</li></a>
   <a href="/rss"><li>Canal RSS </li></a>
+  <a href="/visitados"><li>Más visitados</li></a>
 </ul>
 
 {% endblock %}
@@ -86,5 +87,9 @@
              &nbsp&nbsp<img src="templates/images/cora.png" class="corazon"/>&nbsp<b>{{megustas}}</b>
            </form>
          </div>
+         <div class="contentarea">
+           <p><b>Visitas:</b>{{visitas}}</p>
+         </div>
      {% endif %}
+  </div>
 {% endblock %}

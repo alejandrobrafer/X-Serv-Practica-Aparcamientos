@@ -45,6 +45,8 @@ p {
 	font-size: {{letra}};
 	line-height:130%;
 }
+
+
 header {
 	height:424px;
 	background:url(../images/headerBackground.jpg) repeat-x;

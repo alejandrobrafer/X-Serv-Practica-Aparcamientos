@@ -449,20 +449,10 @@ def pag_ppal_xml(request, usu):
 
 def pag_ppal_xml(request):
     aparcamientos_comentados = Aparcamiento.objects.annotate(
-                    num_com=Count('comentario')).order_by('-num_com')[:5]
+                    num_com=Count('comentario')).order_by('-num_com')
+    if len(aparcamientos_comentados) > 5:
+        aparcamientos_comentados = aparcamientos_comentados[0:5]
     template = get_template('pag_ppal.xml')
     context = RequestContext(request, {'aparcamientos_comentados': aparcamientos_comentados})
     resp = template.render(context)
     return HttpResponse(resp, content_type="text/xml")
-    #aparcamientos_comentados = Aparcamiento.objects.annotate(
-    #                num_com=Count('comentario')).order_by('-num_com')[:5]
-    #lista_aparcamientos = []
-    #for nombre in aparcamientos_comentados:
-    #    aparcamientos = Aparcamiento.objects.filter(nombre=nombre)
-
-    #    lista_aparcamientos.append((aparcamientos))
-    #template = get_template('pag_ppal.xml')
-    #context = RequestContext(request, {'lista_aparcamientos': lista_aparcamientos,
-    #                                    'aparcamientos':aparcamientos})
-    #resp = template.render(context)
-    #return HttpResponse(resp, content_type="text/xml")

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Aparcamiento',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('idEntidad', models.IntegerField()),
                 ('nombre', models.CharField(max_length=32)),
                 ('contentUrl', models.URLField(max_length=300)),
@@ -27,26 +27,27 @@ class Migration(migrations.Migration):
                 ('accesibilidad', models.IntegerField(choices=[(0, '0'), (1, '1')])),
                 ('coordenadaX', models.PositiveIntegerField()),
                 ('coordenadaY', models.PositiveIntegerField()),
-                ('latitud', models.FloatField(null=True, blank=True)),
-                ('longitud', models.FloatField(null=True, blank=True)),
+                ('latitud', models.FloatField(blank=True, null=True)),
+                ('longitud', models.FloatField(blank=True, null=True)),
                 ('telefono', models.TextField()),
                 ('email', models.TextField()),
+                ('visitas', models.IntegerField(default=0)),
             ],
         ),
         migrations.CreateModel(
             name='Cambio',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('usuario', models.CharField(max_length=32)),
-                ('titulo', models.CharField(default='', max_length=64)),
-                ('letra', models.CharField(null=True, blank=True, max_length=64)),
+                ('titulo', models.CharField(max_length=64, default='')),
+                ('letra', models.CharField(blank=True, max_length=64, null=True)),
                 ('color', models.CharField(max_length=32)),
             ],
         ),
         migrations.CreateModel(
             name='Comentario',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('texto', models.TextField()),
                 ('aparcamiento', models.ForeignKey(to='aparcamientos.Aparcamiento')),
             ],
@@ -54,7 +55,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Elegido',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('usuario', models.CharField(max_length=32)),
                 ('fecha', models.DateField(auto_now=True)),
                 ('aparcamiento', models.ForeignKey(to='aparcamientos.Aparcamiento')),
@@ -63,7 +64,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Megusta',
             fields=[
-                ('id', models.AutoField(auto_created=True, verbose_name='ID', serialize=False, primary_key=True)),
+                ('id', models.AutoField(primary_key=True, auto_created=True, serialize=False, verbose_name='ID')),
                 ('usuario', models.CharField(max_length=32)),
                 ('aparcamiento', models.ForeignKey(to='aparcamientos.Aparcamiento')),
             ],

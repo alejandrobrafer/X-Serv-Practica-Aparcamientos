@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^aparcamientos$', views.pag_aparcamientos, name= "Pagina con todos los aparcamientos"),
     url(r'^aparcamientos/(\d+)', views.pag_aparcamiento, name= "Pagina de un aparcamiento"),
     url(r'^visitados$', views.ranking_visitas, name= "Ranking de los aparcamientos mas visitados"),
-    url(r'^ppal_xml$', views.pag_ppal_xml),
+    url(r'^ppal_xml$', views.pag_ppal_xml, name= "Pagina principal XML"),
     url(r'^rss/?$', views.rss, name='Canal RSS para los comentarios puestos'),
     url(r'^(.*)/xml$', views.pag_xml, name= "Canal XML"),
     url(r'^(.*)$', views.pag_usuario, name= "Pagina personal de un usuario"),
